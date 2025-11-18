@@ -1,0 +1,5 @@
+### GET request to example server
+GET http://localhost:4004/api/appointment/ba0ed5f6-a56d-4fe1-9e02-aef004a65eb3
+Content-Type: application/json
+Authorization: Bearer {{token}}
+

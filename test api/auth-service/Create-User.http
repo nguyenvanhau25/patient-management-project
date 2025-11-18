@@ -1,0 +1,9 @@
+### GET request to example server
+POST http://localhost:4004/auth/user
+Content-Type: application/json
+
+{
+  "email": "hau123@gmail.com",
+  "password": "123456",
+  "role": "ADMIN"
+}

@@ -1,0 +1,5 @@
+### GET request to example server
+GET http://localhost:4001/billing/accounts/b4836ade-6506-4f98-970b-012d289786a2
+X-Role: ADMIN
+
+#vì không thông qua api gateway nên ta phải inject x-role

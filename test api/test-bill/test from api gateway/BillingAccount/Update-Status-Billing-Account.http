@@ -1,0 +1,5 @@
+### GET request to example server
+PATCH http://localhost:4004/api/billing/accounts/786f8ea3-cf94-41fa-b669-e3789db2dc69/status?status=SUSPENDED
+Authorization: Bearer {{token}}
+
+###

@@ -1,0 +1,7 @@
+### GET request to example server
+GET http://localhost:4000/internal/patient/fdf0f4cf-2b75-42d6-92c9-bea6cfec78f0
+#Content-Type: application/json
+#Authorization: Bearer {{token}}
+X-Role: ADMIN
+
+###

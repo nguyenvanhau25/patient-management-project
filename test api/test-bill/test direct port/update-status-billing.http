@@ -1,0 +1,3 @@
+
+PATCH http://localhost:4001/billing/transactions/786f8ea3-cf94-41fa-b669-e3789db2dc69/status?status=COMPLETED
+X-Role: ADMIN
