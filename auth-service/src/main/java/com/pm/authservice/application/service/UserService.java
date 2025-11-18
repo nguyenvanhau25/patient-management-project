@@ -1,14 +1,10 @@
 package com.pm.authservice.application.service;
 
-import com.pm.authservice.application.dto.UserLogin;
-import com.pm.authservice.application.mapper.UserMapper;
+
 import com.pm.authservice.domain.Role;
 import com.pm.authservice.domain.User;
-import com.pm.authservice.infrastructure.UserRepository;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.pm.authservice.infrastructure.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +19,12 @@ public class UserService {
     private final  PasswordEncoder  passwordEncoder;
 
     public Optional<User> findByEmail(String email) {
+
         return userRepository.findByEmail(email);
+    }
+
+    public Boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     public User createUser(User user){
@@ -34,17 +35,35 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String delete(UUID uuid){
-        User user = userRepository.findById(uuid).orElse(null);
-        if(user == null){
-            return "not found";
-        }
-        userRepository.delete(user);
-        return "success";
+    public boolean delete(UUID id) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    userRepository.delete(user);
+                    return true;
+                })
+                .orElse(false);
     }
+
 
     public List<User> getAll(){
         return userRepository.findAll();
+    }
+
+    public Optional<User> getById(UUID id) {
+        return userRepository.findById(id);
+    }
+    public User updateUser(UUID id, User newData) {
+        return userRepository.findById(id)
+                .map(existing -> {
+                    existing.setEmail(newData.getEmail());
+                    existing.setRole(newData.getRole());
+                    // Nếu muốn đổi password
+                    if (newData.getPassword() != null) {
+                        existing.setPassword(passwordEncoder.encode(newData.getPassword()));
+                    }
+                    return userRepository.save(existing);
+                })
+                .orElse(null);
     }
 
 }

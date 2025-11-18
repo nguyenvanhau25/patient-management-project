@@ -14,11 +14,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests
-                (auth-> auth.anyRequest().permitAll())
+                (auth-> auth
+                        .anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable); // cơ chế bảo vệ các request
         return http.build();
     }
-    // encoder password
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

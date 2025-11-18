@@ -1,0 +1,10 @@
+### Refresh access token
+POST http://localhost:4004/auth/refresh
+Content-Type: application/x-www-form-urlencoded
+
+refreshToken={{refreshToken}}
+
+
+> {% client.global.set("accessToken", response.body.accessToken) %}
+
+### sau 1 thời gian thì không cần log in lại nữa mà chỉ cần chạy để lấy token

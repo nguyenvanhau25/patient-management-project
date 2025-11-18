@@ -1,0 +1,4 @@
+### Delete all refresh tokens of a user
+DELETE http://localhost:4004/auth/logout/all?email=hau123@gmail.com
+
+###

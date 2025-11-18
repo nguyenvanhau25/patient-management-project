@@ -3,6 +3,7 @@ package com.pm.authservice.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -23,4 +24,5 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
 }

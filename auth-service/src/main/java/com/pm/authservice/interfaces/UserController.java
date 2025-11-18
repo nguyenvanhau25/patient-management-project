@@ -1,42 +1,53 @@
 package com.pm.authservice.interfaces;
 
-import com.pm.authservice.application.dto.UserLogin;
 import com.pm.authservice.application.service.UserService;
 import com.pm.authservice.domain.User;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user")
-@Tag(name = "api for user ")
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @Operation(summary = "get all user")
-    public List<User> getUser(){
-        return userService.getAll();
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userService.getAll());
     }
 
-    @PostMapping
-    @Operation(summary = "create user")
-    public User createUser(@RequestBody User user){
-        return userService.createUser(user);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable UUID id) {
+        return userService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable UUID id,
+            @Valid @RequestBody User updatedUser) {
+
+        User user = userService.updateUser(id, updatedUser);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "delete user")
-    public ResponseEntity<String> deleteUser(@PathVariable UUID id){
-        String tel = userService.delete(id);
-        return new ResponseEntity<>(tel, HttpStatus.OK);
-    }
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
+        boolean deleted = userService.delete(id);
 
+        if (!deleted) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok("User deleted successfully");
+    }
 }

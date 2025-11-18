@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -35,7 +36,7 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
-
+    //xác thực token
     public String validateToken(String token) {
         try {
             Jws<Claims> jwt = Jwts.parser().verifyWith((SecretKey) secretKey)
