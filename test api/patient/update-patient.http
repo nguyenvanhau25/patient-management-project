@@ -1,0 +1,13 @@
+### Put
+PUT http://localhost:4004/api/patients/{patientid}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+{
+  "name": "Nguyễn anh hau ",
+  "email": "duongthedioi12345@example.com",
+  "address": "123 Ha Dong, Ha Noi",
+  "dateOfBirth": "2004-05-20"
+}
+###

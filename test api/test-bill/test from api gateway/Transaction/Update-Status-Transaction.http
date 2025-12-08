@@ -1,5 +1,5 @@
 ### GET request to example server
-PATCH http://localhost:4004/api/billing/transactions/28b70823-7897-4ad4-b33d-ac3dd4756597/status?status=COMPLETED
-Authorization: Bearer {{token}}
+PATCH http://localhost:4004/api/billing/transactions/b5d978b2-a1f8-4430-bc2a-0cae28dbcb2d/status?status=COMPLETED
+Authorization: Bearer {{accessToken}}
 
 ###

@@ -10,13 +10,28 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-// xử lí tất cả các request http
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests
-                (auth-> auth
-                        .anyRequest().permitAll())
-                .csrf(AbstractHttpConfigurer::disable); // cơ chế bảo vệ các request
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
+                        .requestMatchers(
+                                "/login",
+                                "/signup",
+                                "/validate",
+                                "/refresh",
+                                "/logout",
+                                "/logout/all",
+                                "/reset"
+                        ).permitAll()
+                        // Only ADMIN can access /user
+                        .requestMatchers("/user").hasRole("ADMIN")
+
+                        .anyRequest().authenticated()
+                );
+
         return http.build();
     }
     @Bean

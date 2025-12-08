@@ -1,0 +1,6 @@
+### GET request to example server
+GET http://localhost:4004/api/analytics/growth-rate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

@@ -7,6 +7,7 @@ import com.pm.patientservice.application.dto.validators.CreatePatientValidationG
 import com.pm.patientservice.application.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class PatientController {
 
 
     @GetMapping
-    @Operation(summary = "Get Patients")
+    @Operation(summary = "Get list Patients")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PatientResponseDTO>> getPatients() {
         List<PatientResponseDTO> patients = patientService.getPatients();
@@ -68,4 +69,19 @@ public class PatientController {
         patientService.deletePatient(id);
         return ResponseEntity.noContent().build();
     }
+    // 5 xem thông tin bản thân bệnh nhân
+    @GetMapping("/{id}")
+    @Operation(summary = "xem thông tin bản thân bệnh nhân")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<PatientResponseDTO> getPatient(@PathVariable UUID id) {
+        return new ResponseEntity<>(patientService.getPatientById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/pdf")
+    @Operation(summary = "xuất báo cáo bệnh nhân")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public void exportPatientPdf(HttpServletResponse response) throws Exception {
+        patientService.exportPatientPdf(response);
+    }
+
 }

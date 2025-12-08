@@ -2,7 +2,7 @@
 POST http://localhost:4004/auth/refresh
 Content-Type: application/x-www-form-urlencoded
 
-refreshToken={{refreshToken}}
+refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2NDg2Nzc2MiwiZXhwIjoxNzY0OTAzNzYyfQ.gW9N2PU8pOzeWcN-cMY-elnfApw34un3TwriODlfFto
 
 
 > {% client.global.set("accessToken", response.body.accessToken) %}

@@ -1,9 +1,11 @@
 package com.pm.authservice.application.service;
 
 
+import com.pm.authservice.application.dto.LoginRequestDTO;
 import com.pm.authservice.domain.Role;
 import com.pm.authservice.domain.User;
 import com.pm.authservice.infrastructure.repo.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final  PasswordEncoder  passwordEncoder;
@@ -28,8 +31,10 @@ public class UserService {
     }
 
     public User createUser(User user){
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        boolean re = user.getPassword().matches(regex);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(user.getRole() == null){
+        if(user.getRole() == null && re == true){
             user.setRole(Role.USER); // mặc định USER
         }
         return userRepository.save(user);
@@ -65,5 +70,16 @@ public class UserService {
                 })
                 .orElse(null);
     }
+    public boolean resetPassword(LoginRequestDTO login){
+        User user = userRepository.findByEmail(login.getEmail()).orElse(null);
+        if(user != null){
+            user.setPassword(passwordEncoder.encode(login.getPassword()));
+            userRepository.save(user);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
 }

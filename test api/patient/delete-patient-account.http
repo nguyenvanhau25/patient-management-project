@@ -1,0 +1,6 @@
+DELETE http://localhost:4004/api/patients/91e590c3-29ef-4e21-84e5-c9b415940d22
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+#delete đồng bộ grpc cả patient và billing account
+###

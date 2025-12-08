@@ -1,0 +1,229 @@
+services:
+  zookeeper:
+    image: zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - internal
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"  # internal container-to-container
+      - "9094:9094"  # external client
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://kafka:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - internal
+    # ---------------------------
+    # API Gateway
+#    # ---------------------------
+#  api-gateway:
+#      image: api-gateway:latest
+#      container_name: api-gateway
+#      ports:
+#        - "4004:4004"
+#      depends_on:
+#        - eureka-server
+#        - patient-service
+#        - billing-service
+#        - analytics-service
+#        - appointment-service
+#        - auth-service
+#      networks:
+#        - internal
+#    # ---------------------------
+#    # eureka Service
+#    # ---------------------------
+#  eureka-server:
+#    image: eureka-server:latest
+#    container_name: eureka-server
+#    ports:
+#      - "8761:8761"
+#    networks:
+#      - internal
+#
+#    # ---------------------------
+#    # patient Service
+#    # ---------------------------
+#  patient-db:
+#    image: postgres:latest
+#    container_name: patient-service-db
+#    environment:
+#      POSTGRES_DB: db
+#      POSTGRES_PASSWORD: 123
+#      POSTGRES_USER: postgres
+#    ports:
+#      - "5000:5432"
+#    networks:
+#      - internal
+#
+#  patient-service:
+#    image: patient-service:latest
+#    container_name: patient-service
+#    ports:
+#      - "4000:4000"
+#    environment:
+#      BILLING_SERVICE_ADDRESS: billing-service
+#      BILLING_SERVICE_GRPC_PORT: 9001
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#      SPRING_DATASOURCE_PASSWORD: 123
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/db
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      SPRING_SQL_INIT_MODE: always
+#    depends_on:
+#      - patient-db
+#      - eureka-server
+#      - kafka
+#    networks:
+#      - internal
+#
+#    # ---------------------------
+#    # Billing Service
+#    # ---------------------------
+#  billing-db:
+#    image: postgres:latest
+#    container_name: billing-service-db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: 123
+#      POSTGRES_DB: db
+#    ports:
+#      - "5002:5432"
+#    networks:
+#      - internal
+#
+#  billing-service:
+#      image: billing-service:latest
+#      container_name: billing-service
+#      ports:
+#        - "4001:4001"   # REST
+#        - "9001:9001"   # gRPC
+#      environment:
+#        SPRING_DATASOURCE_URL: jdbc:postgresql://billing-service-db:5432/db
+#        SPRING_DATASOURCE_USERNAME: postgres
+#        SPRING_DATASOURCE_PASSWORD: 123
+#        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#        SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#        SPRING_SQL_INIT_MODE: always
+#      depends_on:
+#        - billing-db
+#        - eureka-server
+#      networks:
+#        - internal
+#
+#    # ---------------------------
+#    # Analytics Service
+#    # ---------------------------
+#  analytics-db:
+#      image: postgres:latest
+#      container_name: analytics-service-db
+#      environment:
+#        POSTGRES_USER: postgres
+#        POSTGRES_PASSWORD: 123
+#        POSTGRES_DB: db
+#      ports:
+#        - "5004:5432"
+#      networks:
+#        - internal
+#
+#  analytics-service:
+#      image: analytics-service:latest
+#      container_name: analytics-service
+#      ports:
+#        - "4006:4006"
+#      environment:
+#        SPRING_DATASOURCE_URL: jdbc:postgresql://analytics-service-db:5432/db
+#        SPRING_DATASOURCE_USERNAME: postgres
+#        SPRING_DATASOURCE_PASSWORD: 123
+#        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#        SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#        SPRING_SQL_INIT_MODE: always
+#      depends_on:
+#        - analytics-db
+#        - eureka-server
+#        - kafka
+#      networks:
+#        - internal
+#
+#    # ---------------------------
+#    # Appointment Service
+#    # ---------------------------
+#  appointment-db:
+#      image: postgres:latest
+#      container_name: appointment-deployment.yaml-db
+#      environment:
+#        POSTGRES_USER: postgres
+#        POSTGRES_PASSWORD: 123
+#        POSTGRES_DB: db
+#      ports:
+#        - "5003:5432"
+#      networks:
+#        - internal
+#
+#  appointment-service:
+#      image: appointment-service:latest
+#      container_name: appointment-deployment.yaml
+#      ports:
+#        - "4002:4002"
+#      environment:
+#        SPRING_DATASOURCE_URL: jdbc:postgresql://appointment-deployment.yaml-db:5432/db
+#        SPRING_DATASOURCE_USERNAME: postgres
+#        SPRING_DATASOURCE_PASSWORD: 123
+#        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#        SPRING_SQL_INIT_MODE: always
+#      depends_on:
+#        - appointment-db
+#        - eureka-server
+#      networks:
+#        - internal
+#
+#    # ---------------------------
+#    # Auth Service
+#    # ---------------------------
+#  auth-db:
+#      image: postgres:latest
+#      container_name: auth-service-db
+#      environment:
+#        POSTGRES_USER: postgres
+#        POSTGRES_PASSWORD: 123
+#        POSTGRES_DB: db
+#      ports:
+#        - "5001:5432"
+#      networks:
+#        - internal
+#
+#  auth-service:
+#      image: auth-service:latest
+#      container_name: auth-service
+#      ports:
+#        - "4005:4005"
+#      environment:
+#        SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/db
+#        SPRING_DATASOURCE_USERNAME: postgres
+#        SPRING_DATASOURCE_PASSWORD: 123
+#        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#        SPRING_SQL_INIT_MODE: always
+#      depends_on:
+#        - auth-db
+#      networks:
+#        - internal
+
+networks:
+  internal:
+    external: true

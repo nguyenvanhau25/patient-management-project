@@ -1,21 +1,13 @@
-### GET request to example server
-POST  http://localhost:4004/api/billing/accounts/786f8ea3-cf94-41fa-b669-e3789db2dc69/transactions
+POST  http://localhost:4004/api/billing/accounts/51d19e03-5c1c-4ee5-9efb-0cb67b3486fb/transactions
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{accessToken}}
+
 
 {
-  "amount": 120000.0,
+  "amount": 520000.0,
   "type": "DEBIT",
-  "description": "Payment for X-ray service"
+  "description": "Tra tien soi noi chieu"
 }
 
 ###
-// response
-#  "id": "64be9bb3-b72c-4e61-a9ea-8365df614a39",
-#  "accountId": "3af9d0c6-559a-4ca4-8c6b-29d5617f4212",
-#  "amount": 120000.0,
-#  "type": "DEBIT",
-#  "status": "PENDING",
-#  "description": "Payment for X-ray service",
-#  "createdAt": "2025-11-14T10:40:18"
 

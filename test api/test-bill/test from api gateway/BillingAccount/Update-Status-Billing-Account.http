@@ -1,5 +1,5 @@
 ### GET request to example server
-PATCH http://localhost:4004/api/billing/accounts/786f8ea3-cf94-41fa-b669-e3789db2dc69/status?status=SUSPENDED
-Authorization: Bearer {{token}}
+PATCH http://localhost:4004/api/billing/accounts/127a0334-4f82-46bd-8a45-4db1bd732ab9/status?status=SUSPENDED
+Authorization: Bearer {{accessToken}}
 
 ###

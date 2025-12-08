@@ -1,9 +1,6 @@
 package com.pm.billingservice.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,11 +13,16 @@ public class BillingTransaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private UUID billingAccountId;  // liên kết với BillingAccount
+    @ManyToOne
+    @JoinColumn(name = "billing_account_id", nullable = false)
+    private BillingAccount billingAccount;
+
     private String type;            // CHARGE, PAYMENT, REFUND
     private Double amount;
-    private String status;          // PENDING, COMPLETED, FAILED
+
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
     private String description;     //mô tả chi tiết giao dịch
+    @Enumerated(EnumType.STRING)
+    private Status status;          // PENDING, COMPLETED, FAILED
 }

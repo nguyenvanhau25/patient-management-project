@@ -3,8 +3,8 @@ POST http://localhost:4004/auth/signup
 Content-Type: application/json
 
 {
-  "email": "hau2005@gmail.com",
+  "email": "hauu2005@gmail.com",
   "password": "123456",
-  "role": "ADMIN"
+  "role": "USER"
 }
 

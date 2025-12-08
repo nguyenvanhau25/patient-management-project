@@ -1,12 +1,13 @@
 ### GET request to example server
 POST http://localhost:4004/api/patients
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{accessToken}}
+
 
 {
-  "name": "Nguyen Van Đẹp trai",
-  "email": "hauanhh2005.nguyen@example.com",
-  "address": "123 Ha Dong, Ha Noi",
+  "name": "Nguyen Vu Hoang",
+  "email": "hehehaha@example.com",
+  "address": "Me Linh, a Noi",
   "dateOfBirth": "2004-05-20"
 }
 

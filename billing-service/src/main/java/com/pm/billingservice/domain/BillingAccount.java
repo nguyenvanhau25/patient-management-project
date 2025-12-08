@@ -1,12 +1,10 @@
 package com.pm.billingservice.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,4 +23,7 @@ public class BillingAccount {
     private Double balance = 0.0;    // số dư tài khoản
     private String currency = "VND"; // đơn vị tiền tệ
 
+    //LIÊN KẾT 1-N
+    @OneToMany(mappedBy = "billingAccount", cascade = CascadeType.ALL)
+    private List<BillingTransaction> transactions;
 }

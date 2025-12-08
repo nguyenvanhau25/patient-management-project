@@ -3,9 +3,9 @@ POST http://localhost:4004/auth/login
 Content-Type: application/json
 
 {
-  "email": "hau123@gmail.com",
-  "password": "123456"
+  "email": "testuser@test.com",
+  "password": "password123"
 }
 
 
-> {% client.global.set("refreshToken", response.body.refreshToken) %}
+> {% client.global.set("accessToken", response.body.accessToken) %}

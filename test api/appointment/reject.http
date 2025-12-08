@@ -1,0 +1,4 @@
+POST http://localhost:4004/api/appointment/{appointmentid}/reject
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+###

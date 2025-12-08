@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package billing.events;
+option java_multiple_files = true;
+
+message BillingEvent {
+  string eventType = 1;
+  string transactionId = 2;
+  string billingAccountId = 3;
+  string patientId = 4;
+  string type = 5;
+  double amount = 6;
+  string status = 7;
+  string createdAt = 8;
+}

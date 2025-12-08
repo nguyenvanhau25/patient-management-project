@@ -1,4 +1,4 @@
 ### GET request to example server
-DELETE http://localhost:4004/api/billing/57c6ec82-250d-4760-8732-7751af7bb8e4
-Authorization: Bearer {{token}}
+DELETE http://localhost:4004/api/billing/79181871-471b-4810-aa47-db1152f89ab9
+Authorization: Bearer {{accessToken}}
 ###

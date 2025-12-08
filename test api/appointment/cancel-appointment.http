@@ -1,6 +1,6 @@
 ### GET request to example server
-POST http://localhost:4004/api/appointment/ba0ed5f6-a56d-4fe1-9e02-aef004a65eb3
+POST http://localhost:4004/api/appointment/222d10f6-baca-4a1c-b73d-73b3923a77be
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{accessToken}}
 
 ###

@@ -1,0 +1,5 @@
+POST http://localhost:4004/api/appointment/{appointmentid}/reschedule/newDateTime?newDateTime=2025-10-20T11:00:00
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

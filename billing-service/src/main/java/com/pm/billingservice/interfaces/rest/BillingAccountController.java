@@ -1,8 +1,13 @@
 package com.pm.billingservice.interfaces.rest;
 
 import com.pm.billingservice.application.service.BillingAccountService;
+import com.pm.billingservice.application.service.BillingTransactionService;
 import com.pm.billingservice.domain.BillingAccount;
 import com.pm.billingservice.domain.BillingTransaction;
+import com.pm.billingservice.domain.Status;
+import com.pm.billingservice.infrastructure.exception.AppException;
+import com.pm.billingservice.infrastructure.exception.ErrorCode;
+import com.pm.billingservice.interfaces.dto.BillingAccountResponse;
 import com.pm.billingservice.interfaces.dto.CreateBillingAccountRequest;
 import com.pm.billingservice.interfaces.dto.CreateTransactionRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,12 +27,12 @@ import java.util.UUID;
 @Tag(name = "Billing API", description = "API quản lý billing account và transaction")
 public class BillingAccountController {
     private final BillingAccountService billingAccountService;
-
+    private final BillingTransactionService billingTransactionService;
 
     // 1. Tạo BillingAccount (ADMIN)
     @PostMapping("/accounts")
     @Operation(summary = "Tạo tài khoản Billing mới")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingAccount>
     createBillingAccount(@RequestBody CreateBillingAccountRequest request) {
 
@@ -36,23 +41,25 @@ public class BillingAccountController {
                 request.getName(),
                 request.getEmail()
         );
+        if (account == null) {
+            throw new AppException(ErrorCode.INTERNAL_ERROR);
+        }
         return ResponseEntity.ok(account);
     }
 
-    // 2. Lấy thông tin BillingAccount theo ID (USER + ADMIN)
+    // 2. xem thông tin account
     @GetMapping("/accounts/{accountId}")
     @Operation(summary = "Lấy thông tin BillingAccount theo ID")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingAccount> getBillingAccount(@PathVariable UUID accountId) {
-        return billingAccountService.getBillingAccount(accountId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<BillingAccountResponse> getBillingAccount(@PathVariable UUID accountId) {
+        BillingAccountResponse response = billingAccountService.getBillingAccount(accountId);
+        return ResponseEntity.ok(response);
     }
 
     // 3. Cập nhật trạng thái Account (ADMIN)
     @PatchMapping("/accounts/{accountId}/status")
     @Operation(summary = "Cập nhật trạng thái BillingAccount")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingAccount>
     updateAccountStatus(@PathVariable UUID accountId,
                         @RequestParam String status) {
@@ -65,47 +72,51 @@ public class BillingAccountController {
     @Operation(summary = "Xóa BillingAccount")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteBillingAccount(@PathVariable UUID id) {
-        billingAccountService.deleteAccount(id);
+         billingAccountService.deleteAccount(id);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    // 5. Tạo transaction (USER + ADMIN)
+    // Tạo transaction (USER + ADMIN)
     @PostMapping("/accounts/{accountId}/transactions")
     @Operation(summary = "Tạo giao dịch cho Billing Account")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingTransaction> createTransaction(@PathVariable UUID accountId,
                                                                 @RequestBody CreateTransactionRequest request) {
-        BillingTransaction transaction = billingAccountService.createTransaction(
+        BillingTransaction transaction = billingTransactionService.createTransaction(
                 accountId,
                 request.getAmount(),
                 request.getType(),
                 request.getDescription()
         );
+        if (transaction == null) {
+            throw new AppException(ErrorCode.TRANSACTION_NOT_FOUND);
+        }
         return ResponseEntity.ok(transaction);
     }
 
-    // 6. Lấy danh sách transaction (USER + ADMIN)
+    // Lấy lịch sử transaction (USER + ADMIN)
     @GetMapping("/accounts/{accountId}/transactions")
     @Operation(summary = "Lấy danh sách transaction theo account ID")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<BillingTransaction>>
     getTransactions(@PathVariable UUID accountId) {
         List<BillingTransaction> transactions =
-                billingAccountService.getTransactions(accountId);
+                billingTransactionService.getTransactions(accountId);
         return ResponseEntity.ok(transactions);
     }
 
-    // 7. Update trạng thái transaction (ADMIN)
+    //Update trạng thái transaction (ADMIN)
     @PatchMapping("/transactions/{transactionId}/status")
     @Operation(summary = "Cập nhật trạng thái giao dịch")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BillingTransaction>
     updateTransactionStatus(@PathVariable UUID transactionId,
                             @RequestParam String status) {
-        BillingTransaction transaction = billingAccountService
+        BillingTransaction transaction = billingTransactionService
                 .updateTransactionStatus(transactionId, status);
+
         return ResponseEntity.ok(transaction);
     }
-
 
 }

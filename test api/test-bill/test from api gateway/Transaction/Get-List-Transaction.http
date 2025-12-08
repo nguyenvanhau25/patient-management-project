@@ -1,4 +1,4 @@
 ### GET request to example server
-GET http://localhost:4004/api/billing/accounts/786f8ea3-cf94-41fa-b669-e3789db2dc69/transactions
-Authorization: Bearer {{token}}
+GET http://localhost:4004/api/billing/accounts/1f277497-c0c8-4f24-9c85-384f92c7347f/transactions
+Authorization: Bearer {{accessToken}}
 ###

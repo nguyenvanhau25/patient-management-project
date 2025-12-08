@@ -1,0 +1,6 @@
+### GET request to example server
+POST http://localhost:4004/api/appointment/{appointmentid}/confirm
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

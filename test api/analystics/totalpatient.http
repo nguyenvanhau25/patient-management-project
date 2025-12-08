@@ -1,0 +1,6 @@
+
+GET http://localhost:4004/api/analytics/patients/count?date=2025-11-26
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

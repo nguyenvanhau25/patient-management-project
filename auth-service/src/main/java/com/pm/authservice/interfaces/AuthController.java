@@ -7,6 +7,8 @@ import com.pm.authservice.application.service.RefreshTokenService;
 import com.pm.authservice.application.service.UserService;
 import com.pm.authservice.domain.RefreshToken;
 import com.pm.authservice.domain.User;
+import com.pm.authservice.infrastructure.exception.RefreshTokenNotFoundException;
+import com.pm.authservice.infrastructure.exception.UserAlreadyExistsException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+
 
     @PostMapping("/login")
     @Operation(summary = "Login & generate access + refresh token")
@@ -37,18 +41,21 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(401).build());
     }
 
+
     @PostMapping("/signup")
     @Operation(summary = "Register user")
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
 
         if (userService.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(409).build();
+            throw new UserAlreadyExistsException(user.getEmail());
         }
+
 
         userService.createUser(user);
         return ResponseEntity.ok(user);
     }
 
+    //  kiểm tra token
     @Operation(summary = "Validate Access Token & return role")
     @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validateToken(
@@ -77,6 +84,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    // refresh token
     @PostMapping("/refresh")
     @Operation(summary = "Generate new access token using refresh token")
     public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
@@ -97,16 +105,17 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken.get()));
     }
-    //user đang đăng nhập trên laptop và điện thoại, xóa token laptop thì điện thoại vẫn còn dùng được.
     @DeleteMapping("/logout")
+    @Operation(summary = "đăng xuất")
     public ResponseEntity<String> logout(@RequestParam String refreshToken) {
         boolean deleted = refreshTokenService.deleteByToken(refreshToken);
-        if (deleted) {
-            return ResponseEntity.ok("Refresh token deleted successfully");
-        }
-        return ResponseEntity.status(404).body("Refresh token not found");
+        if (!deleted) throw new RefreshTokenNotFoundException(refreshToken);
+        return ResponseEntity.ok("Refresh token deleted successfully");
     }
+
+    // 6 đăng xuất tất cả
     @DeleteMapping("/logout/all")
+    @Operation(summary = "đăng xuất tất cả")
     public ResponseEntity<String> logoutAll(@RequestParam String email) {
         boolean deleted = refreshTokenService.deleteByEmail(email);
         if (deleted) {
@@ -115,6 +124,23 @@ public class AuthController {
         return ResponseEntity.status(404).body("No refresh tokens found for user: " + email);
     }
 
+    // 7 reset/change password
+    @PostMapping("/reset")
+    @Operation(summary = "reset/change password ")
+    public ResponseEntity<String> resetPassword(@RequestBody LoginRequestDTO change) {
+        boolean reset = userService.resetPassword(change);
+        if (reset) {
+            return ResponseEntity.ok("Password reset successfully");
+        }
+        return ResponseEntity.status(404).body("Password reset failed");
+    }
+
+    // 8 xem tất cả danh sách user
+    @GetMapping("/user")
+    @Operation(summary = "xem danh sách user")
+    public ResponseEntity<List<User>> getAll(){
+        return ResponseEntity.ok(userService.getAll());
+    }
 
     }
 
