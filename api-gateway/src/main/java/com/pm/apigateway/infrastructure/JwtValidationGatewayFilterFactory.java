@@ -37,7 +37,7 @@ public class JwtValidationGatewayFilterFactory
                     .uri("/validate")
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .retrieve()
-                    .bodyToMono(RoleResponse.class) // <- nhận JSON có field role
+                    .bodyToMono(RoleResponse.class) //  nhận JSON có field role
                     .flatMap(roleResponse -> {
                         if (roleResponse == null
                                 || roleResponse.getRole() == null

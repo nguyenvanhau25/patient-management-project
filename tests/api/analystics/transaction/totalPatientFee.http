@@ -1,0 +1,5 @@
+### GET request to example server
+GET http://localhost:4004/api/analytics/revenue/patient/535bfb85-8dc2-4899-bca2-621d7276e4b9
+Authorization: Bearer {{accessToken}}
+
+###

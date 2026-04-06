@@ -2,9 +2,8 @@ package com.pm.billingservice.interfaces.rest;
 
 import com.pm.billingservice.application.service.BillingAccountService;
 import com.pm.billingservice.application.service.BillingTransactionService;
-import com.pm.billingservice.domain.BillingAccount;
-import com.pm.billingservice.domain.BillingTransaction;
-import com.pm.billingservice.domain.Status;
+import com.pm.billingservice.domain.model.account.BillingAccount;
+import com.pm.billingservice.domain.model.transaction.BillingTransaction;
 import com.pm.billingservice.infrastructure.exception.AppException;
 import com.pm.billingservice.infrastructure.exception.ErrorCode;
 import com.pm.billingservice.interfaces.dto.BillingAccountResponse;
@@ -15,6 +14,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,17 +28,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/billing")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Billing API", description = "API quản lý billing account và transaction")
 public class BillingAccountController {
     private final BillingAccountService billingAccountService;
-    private final BillingTransactionService billingTransactionService;
+    private final BillingTransactionService  billingTransactionService;
 
     // 1. Tạo BillingAccount (ADMIN)
     @PostMapping("/accounts")
     @Operation(summary = "Tạo tài khoản Billing mới")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingAccount>
-    createBillingAccount(@RequestBody CreateBillingAccountRequest request) {
+    createBillingAccount(@Valid @RequestBody CreateBillingAccountRequest request) {
 
         BillingAccount account = billingAccountService.createBillingAccount(
                 request.getPatientId(),
@@ -62,7 +67,7 @@ public class BillingAccountController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingAccount>
     updateAccountStatus(@PathVariable UUID accountId,
-                        @RequestParam String status) {
+                        @RequestParam @NotBlank(message = "Trạng thái là bắt buộc") String status) {
         BillingAccount account = billingAccountService.updateAccountStatus(accountId, status);
         return ResponseEntity.ok(account);
     }
@@ -82,7 +87,7 @@ public class BillingAccountController {
     @Operation(summary = "Tạo giao dịch cho Billing Account")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<BillingTransaction> createTransaction(@PathVariable UUID accountId,
-                                                                @RequestBody CreateTransactionRequest request) {
+                                                                @Valid @RequestBody CreateTransactionRequest request) {
         BillingTransaction transaction = billingTransactionService.createTransaction(
                 accountId,
                 request.getAmount(),
@@ -112,11 +117,21 @@ public class BillingAccountController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BillingTransaction>
     updateTransactionStatus(@PathVariable UUID transactionId,
-                            @RequestParam String status) {
+                            @RequestParam @NotBlank(message = "Trạng thái là bắt buộc") String status) {
         BillingTransaction transaction = billingTransactionService
                 .updateTransactionStatus(transactionId, status);
 
         return ResponseEntity.ok(transaction);
+    }
+    // nạp tiền vào tài khoản
+    @PatchMapping("/accounts/{accountId}/recharge")
+    @Operation(summary = "Nạp tiền vào tài khoản")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<BillingAccount> recharge
+    (@PathVariable UUID accountId, @RequestBody @NotNull(message = "Số tiền là bắt buộc") @DecimalMin(value = "0.0", inclusive = false, message = "Số tiền phải lớn hơn 0") Double money){
+     BillingAccount billingAccount = billingAccountService.recharge(accountId, money);
+
+     return ResponseEntity.ok(billingAccount);
     }
 
 }

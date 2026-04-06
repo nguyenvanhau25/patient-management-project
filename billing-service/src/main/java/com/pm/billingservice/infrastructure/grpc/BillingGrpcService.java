@@ -5,7 +5,7 @@ import billing.BillingServiceGrpc;
 import billing.DeleteBillingRequest;
 import billing.DeleteBillingResponse;
 import com.pm.billingservice.application.service.BillingAccountService;
-import com.pm.billingservice.domain.BillingAccount;
+import com.pm.billingservice.domain.model.account.BillingAccount;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;

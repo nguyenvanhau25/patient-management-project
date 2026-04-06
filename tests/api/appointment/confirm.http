@@ -1,0 +1,6 @@
+### GET request to example server
+POST http://localhost:4004/api/appointment/3a30cc33-b24d-4e90-b358-50f7ce13d24d/confirm
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

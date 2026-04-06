@@ -1,0 +1,7 @@
+### GET request to example server
+GET http://localhost:4004/api/billing/accounts/49f80700-59c0-47c9-8d1d-76b6544ef7b7
+Authorization: Bearer {{accessToken}}
+
+
+
+###

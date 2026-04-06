@@ -1,0 +1,9 @@
+PATCH http://localhost:4004/api/billing/accounts/52d5c602-1eb0-46f4-9f40-f8dc1e0eb528/recharge
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+12000000
+
+
+###

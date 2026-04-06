@@ -10,12 +10,12 @@ import lombok.Setter;
 @Getter
 public class LoginRequestDTO {
 
-    @Email(message = "email is a valid ")
-    @NotBlank(message = "email is required")
+    @Email(message = "Email không hợp lệ")
+    @NotBlank(message = "Email không được để trống")
     private String email;
 
-    @NotBlank(message = "password is required")
-    @Size(min = 8, message = "Password must longger 8 characters")
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 8, message = "Mật khẩu phải dài ít nhất 8 ký tự")
     private String password;
 
 }

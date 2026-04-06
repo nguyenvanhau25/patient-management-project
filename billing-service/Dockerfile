@@ -4,4 +4,4 @@ COPY target/*.jar app.jar
 EXPOSE 4001
 EXPOSE 9001
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"]

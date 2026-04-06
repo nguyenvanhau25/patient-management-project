@@ -1,0 +1,5 @@
+### GET request to example server
+PATCH http://localhost:4004/api/billing/accounts/10211943-e5bc-4adc-9a66-6efbfafcb2fc/status?status=BảoTri
+Authorization: Bearer {{accessToken}}
+
+###

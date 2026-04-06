@@ -1,0 +1,118 @@
+### 1) Create patient
+POST http://localhost:4004/api/patients
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Nguyen Van A",
+  "email": "nguyenvana_{{$timestamp}}@mail.com",
+  "address": "Ho Chi Minh City",
+  "dateOfBirth": "1997-10-10",
+  "profileImageUrl": "https://cdn.pm.local/patients/default.png"
+}
+
+> {% client.global.set("patientId", response.body.id) %}
+
+###
+### 2) Update patient image
+PATCH http://localhost:4004/api/patients/{{patientId}}/image
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "profileImageUrl": "https://cdn.pm.local/patients/{{patientId}}.png"
+}
+
+###
+### 3) Create doctor
+POST http://localhost:4004/api/doctors
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Dr. Tran B",
+  "email": "drtranb_{{$timestamp}}@mail.com",
+  "specialization": "Cardiology",
+  "phoneNumber": "0909000000",
+  "experienceYears": 8,
+  "profileImageUrl": "https://cdn.pm.local/doctors/default.png"
+}
+
+> {% client.global.set("doctorId", response.body.id) %}
+
+###
+### 4) Update doctor image
+PATCH http://localhost:4004/api/doctors/{{doctorId}}/image
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "profileImageUrl": "https://cdn.pm.local/doctors/{{doctorId}}.png"
+}
+
+###
+### 5) Create medical record (uses patientId + doctorId)
+POST http://localhost:4004/api/medical-records
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "patientId": "{{patientId}}",
+  "doctorId": "{{doctorId}}",
+  "visitDate": "2026-04-01",
+  "diagnosis": "Mild flu",
+  "symptoms": "Fever, sore throat",
+  "notes": "Rest and hydration"
+}
+
+> {% client.global.set("medicalRecordId", response.body.id) %}
+
+###
+### 6) Add medicine
+POST http://localhost:4004/api/pharmacy/medicines
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Paracetamol 500mg {{$timestamp}}",
+  "manufacturer": "PM Pharma",
+  "price": 15.5,
+  "quantity": 100
+}
+
+> {% client.global.set("medicineId", response.body.id) %}
+
+###
+### 7) Create prescription
+POST http://localhost:4004/api/pharmacy/prescriptions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "patientId": "{{patientId}}",
+  "doctorId": "{{doctorId}}",
+  "medicalRecordId": "{{medicalRecordId}}",
+  "items": [
+    {
+      "medicineId": "{{medicineId}}",
+      "quantity": 2,
+      "dosage": "1 tablet",
+      "instructions": "After meal"
+    }
+  ]
+}
+
+> {% client.global.set("prescriptionId", response.body.id) %}
+
+###
+### 8) Create appointment
+POST http://localhost:4004/api/appointment
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "patientId": "{{patientId}}",
+  "appointmentDate": "2026-04-10T09:00:00"
+}
+
+> {% client.global.set("appointmentId", response.body.result.id) %}

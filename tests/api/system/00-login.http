@@ -1,0 +1,30 @@
+### Login and save access token
+### (If login fails, run signup below first with strong password)
+POST http://localhost:4004/auth/signup
+Content-Type: application/json
+
+{
+  "email": "testuser1@test.com",
+  "password": "Password@123"
+}
+
+###
+### Ensure password is correct (idempotent)
+POST http://localhost:4004/auth/reset
+Content-Type: application/json
+
+{
+  "email": "testuser@test.com",
+  "password": "Password@123"
+}
+
+###
+POST http://localhost:4004/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@test.com",
+  "password": "Password@123"
+}
+
+> {% client.global.set("accessToken", response.body.accessToken) %}

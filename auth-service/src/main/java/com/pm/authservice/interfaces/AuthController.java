@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final AuthService authService;
@@ -31,8 +33,8 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @Operation(summary = "Login & generate access + refresh token")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO request) {
+    @Operation(summary = "Đăng nhập & tạo access + refresh token")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequestDTO request) {
 
         Optional<AuthResponse> authResponse = authService.authenticate(request);
 
@@ -43,7 +45,7 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    @Operation(summary = "Register user")
+    @Operation(summary = "Đăng ký người dùng")
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
 
         if (userService.existsByEmail(user.getEmail())) {
@@ -56,7 +58,7 @@ public class AuthController {
     }
 
     //  kiểm tra token
-    @Operation(summary = "Validate Access Token & return role")
+    @Operation(summary = "Xác thực Access Token & trả về quyền (role)")
     @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validateToken(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
@@ -65,7 +67,7 @@ public class AuthController {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
-            response.put("error", "Authorization header missing or invalid");
+            response.put("error", "Thiếu hoặc sai định dạng header Authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
@@ -74,43 +76,36 @@ public class AuthController {
 
         if (role == null) {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
-            response.put("error", "Invalid token");
+            response.put("error", "Token không hợp lệ");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         response.put("status", HttpStatus.OK.value());
-        response.put("message", "Token is valid");
+        response.put("message", "Token hợp lệ");
         response.put("role", role);
         return ResponseEntity.ok(response);
     }
 
     // refresh token
     @PostMapping("/refresh")
-    @Operation(summary = "Generate new access token using refresh token")
+    @Operation(summary = "Tạo access token mới bằng refresh token")
     public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
 
         Optional<RefreshToken> tokenEntity = refreshTokenService.findByToken(refreshToken);
 
         if (tokenEntity.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid refresh token");
+                    .body("Refresh token đã hết hạn hoặc không hợp lệ");
         }
 
-        Optional<String> newAccessToken = authService.refreshAccessToken(refreshToken);
-
-        if (newAccessToken.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Refresh token expired or invalid");
-        }
-
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken.get()));
+        return ResponseEntity.ok(Map.of("accessToken", tokenEntity.get()));
     }
     @DeleteMapping("/logout")
     @Operation(summary = "đăng xuất")
     public ResponseEntity<String> logout(@RequestParam String refreshToken) {
         boolean deleted = refreshTokenService.deleteByToken(refreshToken);
         if (!deleted) throw new RefreshTokenNotFoundException(refreshToken);
-        return ResponseEntity.ok("Refresh token deleted successfully");
+        return ResponseEntity.ok("Xóa refresh token thành công");
     }
 
     // 6 đăng xuất tất cả
@@ -119,20 +114,20 @@ public class AuthController {
     public ResponseEntity<String> logoutAll(@RequestParam String email) {
         boolean deleted = refreshTokenService.deleteByEmail(email);
         if (deleted) {
-            return ResponseEntity.ok("All refresh tokens deleted for user: " + email);
+            return ResponseEntity.ok("Đã xóa tất cả refresh token của người dùng: " + email);
         }
-        return ResponseEntity.status(404).body("No refresh tokens found for user: " + email);
+        return ResponseEntity.status(404).body("Không tìm thấy refresh token nào của người dùng: " + email);
     }
 
     // 7 reset/change password
     @PostMapping("/reset")
     @Operation(summary = "reset/change password ")
-    public ResponseEntity<String> resetPassword(@RequestBody LoginRequestDTO change) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody LoginRequestDTO change) {
         boolean reset = userService.resetPassword(change);
         if (reset) {
-            return ResponseEntity.ok("Password reset successfully");
+            return ResponseEntity.ok("Đặt lại mật khẩu thành công");
         }
-        return ResponseEntity.status(404).body("Password reset failed");
+        return ResponseEntity.status(404).body("Đặt lại mật khẩu thất bại");
     }
 
     // 8 xem tất cả danh sách user

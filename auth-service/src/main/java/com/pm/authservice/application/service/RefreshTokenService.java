@@ -1,7 +1,7 @@
 package com.pm.authservice.application.service;
 
 import com.pm.authservice.domain.RefreshToken;
-import com.pm.authservice.domain.User;
+
 import com.pm.authservice.infrastructure.repo.RefreshTokenRepository;
 import com.pm.authservice.infrastructure.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

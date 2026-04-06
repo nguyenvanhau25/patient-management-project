@@ -3,7 +3,7 @@ package com.pm.analyticsservice.infrastructure.kafka;
 import billing.events.BillingEvent;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pm.analyticsservice.application.service.AnalyticsService;
-import com.pm.analyticsservice.application.service.BillingServiceImpl;
+import com.pm.analyticsservice.application.service.BillingApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import patient.events.PatientEvent;
 @RequiredArgsConstructor
 public class KafkaConsumer {
     private final AnalyticsService analyticsService;
-    private final BillingServiceImpl billingService;
+    private final BillingApplicationService billingService;
     private static final Logger log = LoggerFactory.getLogger(
             KafkaConsumer.class);
 

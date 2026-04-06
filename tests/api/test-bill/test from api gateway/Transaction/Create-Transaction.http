@@ -1,0 +1,13 @@
+POST  http://localhost:4004/api/billing/accounts/45a53e20-8cc4-489e-8b88-5aca9a78bd62/transactions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+{
+  "amount": 95000.0,
+  "type": "DEBIT",
+  "description": "Tiền thuốc điều trị sau phẫu thuật"
+}
+
+###
+

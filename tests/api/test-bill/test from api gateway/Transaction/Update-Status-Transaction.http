@@ -1,0 +1,5 @@
+### GET request to example server
+PATCH http://localhost:4004/api/billing/transactions/b8f7f228-4d80-493e-80ba-4cc6dd9b2f99/status?status=COMPLETED
+Authorization: Bearer {{accessToken}}
+
+###

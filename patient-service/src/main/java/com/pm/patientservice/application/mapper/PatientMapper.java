@@ -3,7 +3,7 @@ package com.pm.patientservice.application.mapper;
 
 import com.pm.patientservice.application.dto.PatientRequestDTO;
 import com.pm.patientservice.application.dto.PatientResponseDTO;
-import com.pm.patientservice.domain.Patient;
+import com.pm.patientservice.domain.model.Patient;
 
 import java.time.LocalDate;
 
@@ -15,6 +15,7 @@ public class PatientMapper {
     patientDTO.setAddress(patient.getAddress());
     patientDTO.setEmail(patient.getEmail());
     patientDTO.setDateOfBirth(patient.getDateOfBirth().toString());
+    patientDTO.setProfileImageUrl(patient.getProfileImageUrl());
 
     return patientDTO;
   }
@@ -25,6 +26,7 @@ public class PatientMapper {
     patient.setAddress(patientRequestDTO.getAddress());
     patient.setEmail(patientRequestDTO.getEmail());
     patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
+    patient.setProfileImageUrl(patientRequestDTO.getProfileImageUrl());
     return patient;
   }
 }

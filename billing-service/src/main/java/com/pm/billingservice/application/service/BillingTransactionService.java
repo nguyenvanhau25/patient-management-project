@@ -1,19 +1,19 @@
 package com.pm.billingservice.application.service;
 
 import com.pm.billingservice.application.dto.BillingEventDto;
-import com.pm.billingservice.domain.BillingAccount;
-import com.pm.billingservice.domain.BillingTransaction;
+import com.pm.billingservice.domain.model.account.BillingAccount;
+import com.pm.billingservice.domain.model.transaction.BillingTransaction;
 import com.pm.billingservice.domain.Status;
+import com.pm.billingservice.domain.repository.BillingAccountDomainRepository;
+import com.pm.billingservice.domain.repository.BillingTransactionDomainRepository;
+import com.pm.billingservice.domain.service.BillingTransactionDomainService;
 import com.pm.billingservice.infrastructure.exception.AppException;
 import com.pm.billingservice.infrastructure.exception.ErrorCode;
 import com.pm.billingservice.infrastructure.kafka.KafkaProducer;
-import com.pm.billingservice.infrastructure.repo.BillingAccountRepository;
-import com.pm.billingservice.infrastructure.repo.BillingTransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,68 +21,58 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class BillingTransactionService {
-    private final BillingTransactionRepository transactionRepository;
-    private final BillingAccountRepository accountRepository;
-   private final KafkaProducer kafkaProducer;
+    private final KafkaProducer kafkaProducer;
+    private final BillingAccountDomainRepository accountRepo;
+    private final BillingTransactionDomainRepository transactionRepo;
+    private final BillingTransactionDomainService domainService;
 
 
     // Tạo transaction (charge/payment/refund)
-    public BillingTransaction createTransaction(UUID accountId, Double amount, String type, String description) {
-        BillingAccount account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-
-        BillingTransaction transaction = new BillingTransaction();
-        transaction.setBillingAccount(account);
-        transaction.setAmount(amount);
-        transaction.setType(type);
-        transaction.setStatus(Status.PENDING);
-        transaction.setDescription(description);
-        transaction.setCreatedAt(LocalDateTime.now());
-
-        // Lưu transaction
-        return transactionRepository.save(transaction);
+    public BillingTransaction createTransaction(
+            UUID accountId,
+            Double amount,
+            String type,
+            String description
+    ) {
+        BillingAccount account = accountRepo.findById(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.BILLING_ACCOUNT_NOT_FOUND));
+        return domainService.createTransaction(account,amount, type, description);
     }
+
 
     // Lấy lịch sử transaction của account
     public List<BillingTransaction> getTransactions(UUID accountId) {
-        return transactionRepository.findByBillingAccountId(accountId);
+        return transactionRepo.findByAccountId(accountId);
     }
+    // complete giao dịch
 
 
     // update status
     public BillingTransaction updateTransactionStatus(UUID transactionId, String status) {
 
-        BillingTransaction transaction = transactionRepository.findById(transactionId)
+        BillingTransaction transaction = transactionRepo.findById(transactionId)
                 .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
-
-        transaction.setStatus(Status.valueOf(status));
-        transaction.setCompletedAt(LocalDateTime.now());
 
         if (Status.COMPLETED.name().equals(status)) {
 
             BillingAccount account = transaction.getBillingAccount();
 
-            if ("PAYMENT".equals(transaction.getType())) {
-                account.setBalance(account.getBalance() + transaction.getAmount());
-            }
-            if ("CHARGE".equals(transaction.getType())) {
-                account.setBalance(account.getBalance() - transaction.getAmount());
-            }
+            domainService.completeTransaction(account, transaction);
 
-        BillingEventDto dto = BillingEventDto.builder()
-                .transactionId(transaction.getId().toString())
-                .billingAccountId(account.getId().toString())
-                .patientId(account.getPatientId())
-                .amount(transaction.getAmount())
-                .status(transaction.getStatus().name())
-                .type(transaction.getType())
-                .createdAt(transaction.getCreatedAt().toString())
-                .build();
-            accountRepository.save(account);
-           kafkaProducer.sendEvent(dto);
+            accountRepo.save(account);
+            BillingEventDto dto = BillingEventDto.builder()
+                    .transactionId(transaction.getId().toString())
+                    .billingAccountId(account.getId().toString())
+                    .patientId(account.getPatientId())
+                    .amount(transaction.getAmount())
+                    .status(transaction.getStatus().name())
+                    .type(transaction.getType())
+                    .createdAt(transaction.getCreatedAt().toString())
+                    .build();
+            kafkaProducer.sendEvent(dto);
+
         }
+        return transaction;
 
-        return transactionRepository.save(transaction);
     }
-
 }

@@ -2,7 +2,6 @@ package com.pm.billingservice.infrastructure.kafka;
 
 import billing.events.BillingEvent;
 import com.pm.billingservice.application.dto.BillingEventDto;
-import com.pm.billingservice.domain.BillingTransaction;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

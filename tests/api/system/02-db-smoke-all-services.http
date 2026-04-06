@@ -1,0 +1,38 @@
+### DB smoke - patient service
+GET http://localhost:4004/api/patients
+Authorization: Bearer {{accessToken}}
+
+###
+### DB smoke - doctor service
+GET http://localhost:4004/api/doctors
+Authorization: Bearer {{accessToken}}
+
+###
+### DB smoke - clinical service
+GET http://localhost:4004/api/medical-records/patient/{{patientId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### DB smoke - pharmacy service
+GET http://localhost:4004/api/pharmacy/medicines
+Authorization: Bearer {{accessToken}}
+
+###
+### DB smoke - appointment service
+GET http://localhost:4004/api/appointment/{{appointmentId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### DB smoke - billing service
+GET http://localhost:4004/api/billing/accounts/{{patientId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### Read model/analytics smoke
+GET http://localhost:4004/api/analytics/patients/count?date=2026-04-01
+Authorization: Bearer {{accessToken}}
+
+###
+### Swagger aggregate from gateway
+GET http://localhost:4004/swagger-ui.html
+

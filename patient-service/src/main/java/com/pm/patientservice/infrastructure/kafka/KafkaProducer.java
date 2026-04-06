@@ -1,5 +1,5 @@
 package com.pm.patientservice.infrastructure.kafka;
-import com.pm.patientservice.domain.Patient;
+import com.pm.patientservice.domain.model.Patient;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

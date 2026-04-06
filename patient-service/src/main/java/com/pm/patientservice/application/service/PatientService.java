@@ -9,13 +9,13 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.pm.patientservice.application.dto.PatientRequestDTO;
 import com.pm.patientservice.application.dto.PatientResponseDTO;
-import com.pm.patientservice.infrastructure.exception.EmailAlreadyExistsException;
+import com.pm.patientservice.domain.repository.PatientDomainRepository;
+import com.pm.patientservice.domain.service.PatientDomainService;
 import com.pm.patientservice.infrastructure.exception.PatientNotFoundException;
 import com.pm.patientservice.infrastructure.grpc.BillingServiceGrpcClient;
 import com.pm.patientservice.infrastructure.kafka.KafkaProducer;
 import com.pm.patientservice.application.mapper.PatientMapper;
-import com.pm.patientservice.domain.Patient;
-import com.pm.patientservice.infrastructure.repo.PatientRepository;
+import com.pm.patientservice.domain.model.Patient;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,73 +26,102 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class PatientService {
 
-  private final PatientRepository patientRepository;
+  private final PatientDomainRepository patientRepo;
+  private final PatientDomainService domainService;
   private final BillingServiceGrpcClient billingServiceGrpcClient;
   private final KafkaProducer kafkaProducer;
 
   public List<PatientResponseDTO> getPatients() {
-    List<Patient> patients = patientRepository.findAll();
-    return patients.stream().map(PatientMapper::toDTO).toList();
+    return patientRepo.findAll()
+            .stream()
+            .map(PatientMapper::toDTO)
+            .toList();
   }
 
-  public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
-    if (patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
-      throw new EmailAlreadyExistsException(
-              "A patient with this email " + "already exists"
-                      + patientRequestDTO.getEmail());
+  public PatientResponseDTO createPatient(PatientRequestDTO dto) {
+
+    domainService.ensureEmailNotExists(
+            patientRepo.existsByEmail(dto.getEmail()),
+            dto.getEmail()
+    );
+
+    Patient patient = Patient.register(
+            dto.getName(),
+            dto.getEmail(),
+            dto.getAddress(),
+            LocalDate.parse(dto.getDateOfBirth())
+    );
+
+    Patient saved = patientRepo.save(patient);
+    if (dto.getProfileImageUrl() != null && !dto.getProfileImageUrl().isBlank()) {
+      saved.updateProfileImage(dto.getProfileImageUrl());
+      saved = patientRepo.save(saved);
     }
 
-    Patient newPatient = patientRepository.save(
-            PatientMapper.toModel(patientRequestDTO));
-// khi tao patient thi se tao luon 1 cai tài khoản thanh toán
-    billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
-            newPatient.getName(), newPatient.getEmail());
+    // khi tao patient thi se tao luon 1 cai tài khoản thanh toán
+    billingServiceGrpcClient.createBillingAccount(saved.getId().toString(),
+            saved.getName(), saved.getEmail());
 
-    kafkaProducer.sendEvent(newPatient);
+    kafkaProducer.sendEvent(saved);
 
-    return PatientMapper.toDTO(newPatient);
+    return PatientMapper.toDTO(saved);
   }
 
-  public PatientResponseDTO updatePatient(UUID id,
-                                          PatientRequestDTO patientRequestDTO) {
 
-    Patient patient = patientRepository.findById(id).orElseThrow(
-            () -> new PatientNotFoundException("Patient not found with ID: " + id));
+  public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO dto) {
 
-    if (patientRepository.existsByEmailAndIdNot(patientRequestDTO.getEmail(),
-            id)) {
-      throw new EmailAlreadyExistsException(
-              "A patient with this email " + "already exists"
-                      + patientRequestDTO.getEmail());
+    Patient patient = patientRepo.findById(id)
+            .orElseThrow(() ->
+                    new PatientNotFoundException("Không tìm thấy bệnh nhân với ID: " + id));
+
+    domainService.ensureEmailNotExists(
+            patientRepo.existsByEmailAndNotId(dto.getEmail(), id),
+            dto.getEmail()
+    );
+
+    patient.updateProfile(
+            dto.getName(),
+            dto.getEmail(),
+            dto.getAddress(),
+            LocalDate.parse(dto.getDateOfBirth())
+    );
+    if (dto.getProfileImageUrl() != null && !dto.getProfileImageUrl().isBlank()) {
+      patient.updateProfileImage(dto.getProfileImageUrl());
     }
 
-    patient.setName(patientRequestDTO.getName());
-    patient.setAddress(patientRequestDTO.getAddress());
-    patient.setEmail(patientRequestDTO.getEmail());
-    patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
-
-    Patient updatedPatient = patientRepository.save(patient);
-    return PatientMapper.toDTO(updatedPatient);
+    return PatientMapper.toDTO(patientRepo.save(patient));
   }
 
-  // xóa patient xóa luôn cả tài khoản thanh toán
+
   public void deletePatient(UUID id) {
 
-    patientRepository.deleteById(id);
-    try {
-      billingServiceGrpcClient.deleteBillingAccount(id.toString());
-    } catch (Exception e) {
-      throw new PatientNotFoundException("Patient not found with ID: " + id);
+    if (!patientRepo.existsById(id)) {
+      throw new PatientNotFoundException("Không tìm thấy bệnh nhân với ID: " + id);
     }
+
+    patientRepo.deleteById(id);
+
+    billingServiceGrpcClient.deleteBillingAccount(id.toString());
   }
 
-  public boolean existsById(UUID id) {
-    return patientRepository.existsById(id);
-  }
 
   public PatientResponseDTO getPatientById(UUID id) {
-    Patient patient = patientRepository.findById(id).orElseThrow();
+    Patient patient = patientRepo.findById(id)
+            .orElseThrow(() ->
+                    new PatientNotFoundException("Không tìm thấy bệnh nhân với ID: " + id));
     return PatientMapper.toDTO(patient);
+  }
+
+
+  public boolean existsById(UUID id) {
+    return patientRepo.existsById(id);
+  }
+
+  public PatientResponseDTO updatePatientImage(UUID id, String profileImageUrl) {
+    Patient patient = patientRepo.findById(id)
+            .orElseThrow(() -> new PatientNotFoundException("Không tìm thấy bệnh nhân với ID: " + id));
+    patient.updateProfileImage(profileImageUrl);
+    return PatientMapper.toDTO(patientRepo.save(patient));
   }
 
   // xuất file pdf
@@ -100,24 +129,24 @@ public class PatientService {
     response.setContentType("application/pdf");
     response.setHeader("Content-Disposition", "attachment; filename=patients_report.pdf");
 
-    List<Patient> patients = patientRepository.findAll();
+    List<Patient> patients = patientRepo.findAll();
 
     com.lowagie.text.Document document = new com.lowagie.text.Document();
     PdfWriter.getInstance(document, response.getOutputStream());
 
     document.open();
 
-    com.lowagie.text.Paragraph title = new com.lowagie.text.Paragraph("Patient Report");
+    com.lowagie.text.Paragraph title = new com.lowagie.text.Paragraph("Báo cáo danh sách bệnh nhân");
     title.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
     document.add(title);
 
     PdfPTable table = new PdfPTable(4);
     table.addCell("ID");
-    table.addCell("Name");
+    table.addCell("Tên");
     table.addCell("Email");
-    table.addCell("Date of Birth");
-    table.addCell("Address");
-    table.addCell("Created Date");
+    table.addCell("Ngày sinh");
+    table.addCell("Địa chỉ");
+    table.addCell("Ngày đăng ký");
 
     for (Patient p : patients) {
       table.addCell(p.getId().toString());

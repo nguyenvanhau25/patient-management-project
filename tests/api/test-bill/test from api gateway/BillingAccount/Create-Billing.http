@@ -1,0 +1,12 @@
+###
+POST http://localhost:4004/api/billing/accounts
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "patientId": "083d5923-ccb1-4993-9e58-6ce9adc3e5bf",
+  "name": "Nguyen Văn Hậu a",
+  "email": "haunguyenvan1234@gmail.com"
+}
+
+###

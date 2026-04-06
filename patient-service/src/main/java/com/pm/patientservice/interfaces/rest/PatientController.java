@@ -3,6 +3,7 @@ package com.pm.patientservice.interfaces.rest;
 
 import com.pm.patientservice.application.dto.PatientRequestDTO;
 import com.pm.patientservice.application.dto.PatientResponseDTO;
+import com.pm.patientservice.application.dto.PatientImageRequestDTO;
 import com.pm.patientservice.application.dto.validators.CreatePatientValidationGroup;
 import com.pm.patientservice.application.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,14 +23,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/patients")
 @RequiredArgsConstructor
-@Tag(name = "Patient", description = "API for managing Patients")
+@Tag(name = "Bệnh nhân", description = "API quản lý thông tin bệnh nhân")
 public class PatientController {
 
     private final PatientService patientService;
 
 
     @GetMapping
-    @Operation(summary = "Get list Patients")
+    @Operation(summary = "Lấy danh sách bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PatientResponseDTO>> getPatients() {
         List<PatientResponseDTO> patients = patientService.getPatients();
@@ -38,7 +39,7 @@ public class PatientController {
 
 
     @PostMapping
-    @Operation(summary = "Create a new Patient")
+    @Operation(summary = "Tạo mới bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PatientResponseDTO> createPatient(
             @Validated({Default.class, CreatePatientValidationGroup.class})
@@ -51,7 +52,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a new Patient")
+    @Operation(summary = "Cập nhật thông tin bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id,
                                                             @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO) {
@@ -63,7 +64,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a Patient")
+    @Operation(summary = "Xóa bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
         patientService.deletePatient(id);
@@ -75,6 +76,15 @@ public class PatientController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<PatientResponseDTO> getPatient(@PathVariable UUID id) {
         return new ResponseEntity<>(patientService.getPatientById(id), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/image")
+    @Operation(summary = "Cập nhật ảnh bệnh nhân")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<PatientResponseDTO> updatePatientImage(
+            @PathVariable UUID id,
+            @RequestBody @Validated PatientImageRequestDTO requestDTO) {
+        return ResponseEntity.ok(patientService.updatePatientImage(id, requestDTO.getProfileImageUrl()));
     }
 
     @GetMapping("/pdf")
