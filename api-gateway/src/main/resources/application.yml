@@ -4,134 +4,176 @@ server:
 spring:
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            # Route 1: patient-service
-                    - id: patient-service-route
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/api/patients/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: false
+      routes:
+        # --- PUBLIC UPLOAD ROUTES (MUST BE BEFORE PROTECTED ROUTES) ---
+        
+        # Route 1: doctor-service-uploads (Public)
+        - id: doctor-service-uploads-route
+          uri: http://doctor-service:4003
+          predicates:
+            - Path=/api/doctors/uploads/**
+          filters:
+            - StripPrefix=1
 
-                    # Route 2: Swagger docs for patient-service
-                    - id: api-docs-patient-route
-                      uri: http://patient-service:4000
-                      predicates:
-                          - Path=/api-docs/patients
-                      filters:
-                          - RewritePath=/api-docs/patients,/v3/api-docs
+        # Route 2: patient-service-uploads-route (Public)
+        - id: patient-service-uploads-route
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api/patients/uploads/**
+          filters:
+            - StripPrefix=1
 
-                     # Route 3: auth-service
-                    - id: auth-service-route
-                      uri: http://auth-service:4005
-                      predicates:
-                        - Path=/auth/**
-                      filters:
-                        - StripPrefix=1
+        # Route 3: pharmacy-service-uploads-route (Public)
+        - id: pharmacy-service-uploads-route
+          uri: http://pharmacy-service:4008
+          predicates:
+            - Path=/api/pharmacy/uploads/**
+          filters:
+            - StripPrefix=1
 
-                    # Route 4: Swagger docs for auth-service
-                    - id: api-docs-auth-route
-                      uri: http://auth-service:4005
-                      predicates:
-                        - Path=/api-docs/auth
-                      filters:
-                        - RewritePath=/api-docs/auth,/v3/api-docs
+        # --- PROTECTED MAIN ROUTES ---
 
-                    # Route 5: billing-service
-                    - id: billing-service-route
-                      uri: http://billing-service:4001
-                      predicates:
-                        - Path=/api/billing/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
+        # Route 4: patient-service
+        - id: patient-service-route
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api/patients, /api/patients/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
 
-                    # Route 6: Swagger docs for billing-service
-                    - id: api-docs-billing-route
-                      uri: http://billing-service:4001
-                      predicates:
-                        - Path=/api-docs/billing
-                      filters:
-                        - RewritePath=/api-docs/billing,/v3/api-docs
+        # Route 5: auth-service
+        - id: auth-service-route
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/auth, /auth/**
+          filters:
+            - StripPrefix=1
 
-                    #Route 7: billing-service
-                    - id: appointment-service-route
-                      uri: http://appointment-service:4002
-                      predicates:
-                        - Path=/api/appointment/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
-                    # Route 8: Swagger docs for appointment-service (same pattern as api-docs-patient-route)
-                    - id: api-docs-appointment-route
-                      uri: http://appointment-service:4002
-                      predicates:
-                        - Path=/api-docs/appointment
-                      filters:
-                        - RewritePath=/api-docs/appointment,/v3/api-docs
-                     # Route 9: Swagger docs for analytics-service
-                    - id: api-docs-analytics-route
-                      uri: http://analytics-service:4006
-                      predicates:
-                        - Path=/api-docs/analytics
-                      filters:
-                        - RewritePath=/api-docs/analytics,/v3/api-docs
-                    # Route 10: analytics-service
-                    - id: analytics-service-route
-                      uri: http://analytics-service:4006
-                      predicates:
-                        - Path=/api/analytics/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
-                    # Route 11: doctor-service
-                    - id: doctor-service-route
-                      uri: http://doctor-service:4003
-                      predicates:
-                        - Path=/api/doctors/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
-                    # Route 12: Swagger docs for doctor-service
-                    - id: api-docs-doctor-route
-                      uri: http://doctor-service:4003
-                      predicates:
-                        - Path=/api-docs/doctor
-                      filters:
-                        - RewritePath=/api-docs/doctor,/v3/api-docs
-                    # Route 13: clinical-service
-                    - id: clinical-service-route
-                      uri: http://clinical-service:4007
-                      predicates:
-                        - Path=/api/medical-records/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
-                    # Route 14: swagger docs for clinical-service
-                    - id: api-docs-clinical-route
-                      uri: http://clinical-service:4007
-                      predicates:
-                        - Path=/api-docs/clinical
-                      filters:
-                        - RewritePath=/api-docs/clinical,/v3/api-docs
-                    # Route 15: pharmacy-service
-                    - id: pharmacy-service-route
-                      uri: http://pharmacy-service:4008
-                      predicates:
-                        - Path=/api/pharmacy/**
-                      filters:
-                        - StripPrefix=1
-                        - JwtValidation
-                    # Route 16: swagger docs for pharmacy-service
-                    - id: api-docs-pharmacy-route
-                      uri: http://pharmacy-service:4008
-                      predicates:
-                        - Path=/api-docs/pharmacy
-                      filters:
-                        - RewritePath=/api-docs/pharmacy,/v3/api-docs
+        # Route 6: billing-service
+        - id: billing-service-route
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api/billing, /api/billing/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route 7: appointment-service
+        - id: appointment-service-route
+          uri: http://appointment-service:4002
+          predicates:
+            - Path=/api/appointment, /api/appointment/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route 8: analytics-service
+        - id: analytics-service-route
+          uri: http://analytics-service:4006
+          predicates:
+            - Path=/api/analytics, /api/analytics/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route 9: doctor-service
+        - id: doctor-service-route
+          uri: http://doctor-service:4003
+          predicates:
+            - Path=/api/doctors, /api/doctors/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route 10: clinical-service
+        - id: clinical-service-route
+          uri: http://clinical-service:4007
+          predicates:
+            - Path=/api/medical-records, /api/medical-records/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route 11: pharmacy-service
+        - id: pharmacy-service-route
+          uri: http://pharmacy-service:4008
+          predicates:
+            - Path=/api/pharmacy, /api/pharmacy/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # --- SWAGGER DOCUMENTATION ROUTES ---
+
+        - id: api-docs-patient-route
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api-docs/patients
+          filters:
+            - RewritePath=/api-docs/patients,/v3/api-docs
+
+        - id: api-docs-auth-route
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/api-docs/auth
+          filters:
+            - RewritePath=/api-docs/auth,/v3/api-docs
+
+        - id: api-docs-billing-route
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api-docs/billing
+          filters:
+            - RewritePath=/api-docs/billing,/v3/api-docs
+
+        - id: api-docs-appointment-route
+          uri: http://appointment-service:4002
+          predicates:
+            - Path=/api-docs/appointment
+          filters:
+            - RewritePath=/api-docs/appointment,/v3/api-docs
+
+        - id: api-docs-analytics-route
+          uri: http://analytics-service:4006
+          predicates:
+            - Path=/api-docs/analytics
+          filters:
+            - RewritePath=/api-docs/analytics,/v3/api-docs
+
+        - id: api-docs-doctor-route
+          uri: http://doctor-service:4003
+          predicates:
+            - Path=/api-docs/doctor
+          filters:
+            - RewritePath=/api-docs/doctor,/v3/api-docs
+
+        - id: api-docs-clinical-route
+          uri: http://clinical-service:4007
+          predicates:
+            - Path=/api-docs/clinical
+          filters:
+            - RewritePath=/api-docs/clinical,/v3/api-docs
+
+        - id: api-docs-pharmacy-route
+          uri: http://pharmacy-service:4008
+          predicates:
+            - Path=/api-docs/pharmacy
+          filters:
+            - RewritePath=/api-docs/pharmacy,/v3/api-docs
 
 auth:
   service:

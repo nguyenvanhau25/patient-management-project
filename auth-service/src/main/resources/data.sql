@@ -7,13 +7,13 @@ CREATE TABLE IF NOT EXISTS "users" (
     );
 
 INSERT INTO "users" (id, email, password, role)
-SELECT '223e4567-e89b-12d3-a456-426614174006', 'testuser@test.com',
-       '$2b$12$7hoRZfJrRKD2nIm2vHLs7OBETy.LWenXXMLKf99W8M4PUwO6KB7fu', 'ADMIN'
+SELECT '8a0b0c0d-e1f2-4c32-b1a0-d9e8f7a6b5d7', 'admin@example.com',
+       '$2a$10$8.UnVuG9HHgffUDAlk8qnOyzR0W6NmK.5.5k.PZ/zO.J7Z.J.J.Ja', 'ADMIN'
     WHERE NOT EXISTS (
     SELECT 1
     FROM "users"
-    WHERE id = '223e4567-e89b-12d3-a456-426614174006'
-       OR email = 'testuser@test.com'
+    WHERE id = '8a0b0c0d-e1f2-4c32-b1a0-d9e8f7a6b5d7'
+       OR email = 'admin@example.com'
 );
 
 

@@ -13,4 +13,5 @@ public class MedicineResponseDTO {
     private String manufacturer;
     private BigDecimal price;
     private Integer quantity;
+    private String imageUrl;
 }

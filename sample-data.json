@@ -1,0 +1,323 @@
+{
+  "Appointment": [
+    {
+      "id": "a1e1b2c3-d4f5-6789-0123-456789abcdef",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "doctorId": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "appointmentDate": "2026-04-10",
+      "startTime": "09:00",
+      "endTime": "09:30",
+      "status": "SCHEDULED"
+    }
+  ],
+  "MedicalRecord": [
+    {
+      "id": "b2e3f4a5-c6d7-4e3d-2c1b-0a0b0c0d0e0f",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "doctorId": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "visitDate": "2026-04-09",
+      "diagnosis": "Cảm cúm",
+      "symptoms": "Sốt, ho, đau họng",
+      "notes": "Nghỉ ngơi, uống nhiều nước",
+      "createdAt": "2026-04-09T10:00:00",
+      "updatedAt": "2026-04-09T10:00:00"
+    }
+  ],
+  "Doctor": [
+    {
+      "id": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "name": "Nguyễn Văn A",
+      "email": "doctorA@example.com",
+      "specialization": "Nội tổng quát",
+      "phoneNumber": "0123456789",
+      "experienceYears": 10,
+      "profileImageUrl": "",
+      "firstName": "Văn A",
+      "lastName": "Nguyễn",
+      "bio": "Bác sĩ nhiều kinh nghiệm",
+      "qualifications": "Bác sĩ chuyên khoa I",
+      "licenseNumber": "BS123456",
+      "location": "Hà Nội",
+      "consultationFee": 300000,
+      "rating": 4.8
+    },
+    {
+      "id": "2f3e4d5c-6b71-4c32-b1a0-d9e8f7a6b5c5",
+      "name": "Trần Thị C",
+      "email": "doctorC@example.com",
+      "specialization": "Nhi khoa",
+      "phoneNumber": "0987654321",
+      "experienceYears": 7,
+      "profileImageUrl": "",
+      "firstName": "Thị C",
+      "lastName": "Trần",
+      "bio": "Chuyên gia nhi khoa",
+      "qualifications": "Bác sĩ chuyên khoa II",
+      "licenseNumber": "BS654321",
+      "location": "TP.HCM",
+      "consultationFee": 350000,
+      "rating": 4.6
+    },
+    {
+      "id": "3f4e5d6c-7b81-4c32-b1a0-d9e8f7a6b5c6",
+      "name": "Lê Văn D",
+      "email": "doctorD@example.com",
+      "specialization": "Ngoại tổng quát",
+      "phoneNumber": "0911222333",
+      "experienceYears": 15,
+      "profileImageUrl": "",
+      "firstName": "Văn D",
+      "lastName": "Lê",
+      "bio": "Bác sĩ ngoại khoa giỏi",
+      "qualifications": "Tiến sĩ y khoa",
+      "licenseNumber": "BS789012",
+      "location": "Đà Nẵng",
+      "consultationFee": 400000,
+      "rating": 4.9
+    },
+    {
+      "id": "4f5e6d7c-8b91-4c32-b1a0-d9e8f7a6b5c7",
+      "name": "Phạm Thị E",
+      "email": "doctorE@example.com",
+      "specialization": "Da liễu",
+      "phoneNumber": "0933444555",
+      "experienceYears": 8,
+      "profileImageUrl": "",
+      "firstName": "Thị E",
+      "lastName": "Phạm",
+      "bio": "Bác sĩ da liễu tận tâm",
+      "qualifications": "Bác sĩ chuyên khoa I",
+      "licenseNumber": "BS112233",
+      "location": "Hải Phòng",
+      "consultationFee": 320000,
+      "rating": 4.7
+    },
+    {
+      "id": "5f6e7d8c-9b01-4c32-b1a0-d9e8f7a6b5c8",
+      "name": "Hoàng Văn F",
+      "email": "doctorF@example.com",
+      "specialization": "Tim mạch",
+      "phoneNumber": "0977666888",
+      "experienceYears": 12,
+      "profileImageUrl": "",
+      "firstName": "Văn F",
+      "lastName": "Hoàng",
+      "bio": "Chuyên gia tim mạch",
+      "qualifications": "Tiến sĩ y khoa",
+      "licenseNumber": "BS445566",
+      "location": "Cần Thơ",
+      "consultationFee": 380000,
+      "rating": 4.85
+    },
+    {
+      "id": "6f7e8d9c-0b11-4c32-b1a0-d9e8f7a6b5c9",
+      "name": "Đặng Thị G",
+      "email": "doctorG@example.com",
+      "specialization": "Sản phụ khoa",
+      "phoneNumber": "0909888777",
+      "experienceYears": 9,
+      "profileImageUrl": "",
+      "firstName": "Thị G",
+      "lastName": "Đặng",
+      "bio": "Bác sĩ sản phụ khoa tận tâm",
+      "qualifications": "Bác sĩ chuyên khoa II",
+      "licenseNumber": "BS778899",
+      "location": "Huế",
+      "consultationFee": 340000,
+      "rating": 4.75
+    }
+  ],
+  "DoctorSchedule": [
+    {
+      "id": "c3d4e5f6-a7b8-4c32-b1a0-d9e8f7a6b5c0",
+      "doctor": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "workDate": "2026-04-10",
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "isAvailable": true
+    }
+  ],
+  "DoctorReview": [
+    {
+      "id": "d4e5f6a7-b8c9-4c32-b1a0-d9e8f7a6b5c1",
+      "doctor": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "rating": 5,
+      "title": "Rất tốt",
+      "comment": "Bác sĩ tận tình, chu đáo",
+      "appointmentId": "a1e1b2c3-d4f5-6789-0123-456789abcdef",
+      "tags": ["Tận tình", "Đúng giờ"],
+      "wouldRecommend": true,
+      "helpfulCount": 2,
+      "createdAt": "2026-04-10T11:00:00",
+      "updatedAt": "2026-04-10T11:00:00"
+    }
+  ],
+  "PatientAnalytics": [
+    {
+      "id": "e5f6a7b8-c9d0-4c32-b1a0-d9e8f7a6b5c2",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "name": "Trần Thị B",
+      "email": "patientB@example.com",
+      "createdDate": "2026-04-08"
+    }
+  ],
+  "BillingAnalytics": [
+    {
+      "id": "f6a7b8c9-d0e1-4c32-b1a0-d9e8f7a6b5c3",
+      "transactionId": "6c7d8e9f-0a1b-4c32-b1a0-d9e8f7a6b5c4",
+      "billingAccountId": "5b6c7d8e-9a0b-4c32-b1a0-d9e8f7a6b5c5",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "type": "Khám bệnh",
+      "amount": 300000,
+      "status": "COMPLETED",
+      "eventType": "PAYMENT",
+      "createdAt": "2026-04-10T09:30:00"
+    }
+  ],
+  "Prescription": [
+    {
+      "id": "a7b8c9d0-e1f2-4c32-b1a0-d9e8f7a6b5c6",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "doctorId": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+      "medicalRecordId": "b2e3f4a5-c6d7-4e3d-2c1b-0a0b0c0d0e0f",
+      "items": [
+        {
+          "medicineId": "b8c9d0e1-f2a3-4c32-b1a0-d9e8f7a6b5c7",
+          "quantity": 2,
+          "dosage": "2 viên/ngày",
+          "instructions": "Sau ăn"
+        }
+      ],
+      "createdAt": "2026-04-10T10:00:00"
+    }
+  ],
+  "Medicine": [
+    {
+      "id": "b8c9d0e1-f2a3-4c32-b1a0-d9e8f7a6b5c7",
+      "name": "Paracetamol",
+      "manufacturer": "Dược Hậu Giang",
+      "price": 15000,
+      "quantity": 100
+    },
+    {
+      "id": "c9d0e1f2-a3b4-4c32-b1a0-d9e8f7a6b5c8",
+      "name": "Amoxicillin",
+      "manufacturer": "Traphaco",
+      "price": 25000,
+      "quantity": 50
+    },
+    {
+      "id": "d0e1f2a3-b4c5-4c32-b1a0-d9e8f7a6b5c9",
+      "name": "Ibuprofen",
+      "manufacturer": "Sanofi",
+      "price": 20000,
+      "quantity": 80
+    },
+    {
+      "id": "e1f2a3b4-c5d6-4c32-b1a0-d9e8f7a6b5d0",
+      "name": "Vitamin C",
+      "manufacturer": "DHG Pharma",
+      "price": 10000,
+      "quantity": 200
+    },
+    {
+      "id": "f2a3b4c5-d6e7-4c32-b1a0-d9e8f7a6b5d1",
+      "name": "Cefixime",
+      "manufacturer": "Imexpharm",
+      "price": 30000,
+      "quantity": 60
+    },
+    {
+      "id": "1a2b3c4d-5e6f-4c32-b1a0-d9e8f7a6b5d2",
+      "name": "Loratadine",
+      "manufacturer": "Sanofi",
+      "price": 18000,
+      "quantity": 90
+    },
+    {
+      "id": "2b3c4d5e-6f7a-4c32-b1a0-d9e8f7a6b5d3",
+      "name": "Omeprazole",
+      "manufacturer": "Stada",
+      "price": 22000,
+      "quantity": 70
+    },
+    {
+      "id": "3c4d5e6f-7a8b-4c32-b1a0-d9e8f7a6b5d4",
+      "name": "Aspirin",
+      "manufacturer": "Bayer",
+      "price": 25000,
+      "quantity": 120
+    },
+    {
+      "id": "4d5e6f7a-8b9c-4c32-b1a0-d9e8f7a6b5d5",
+      "name": "Metformin",
+      "manufacturer": "Merck",
+      "price": 27000,
+      "quantity": 80
+    },
+    {
+      "id": "5e6f7a8b-9c0d-4c32-b1a0-d9e8f7a6b5d6",
+      "name": "Clorpheniramin",
+      "manufacturer": "Domesco",
+      "price": 12000,
+      "quantity": 150
+    }
+  ],
+  "Patient": [
+    {
+      "id": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "name": "Trần Thị B",
+      "email": "patientB@example.com",
+      "address": "123 Đường ABC, Hà Nội",
+      "profileImageUrl": "",
+      "dateOfBirth": "1990-01-01",
+      "registeredDate": "2026-04-08T08:00:00"
+    }
+  ],
+  "User": [
+    {
+      "id": "8a0b0c0d-e1f2-4c32-b1a0-d9e8f7a6b5d7",
+      "email": "admin@example.com",
+      "password": "$2a$10$8.UnVuG9HHgffUDAlk8qnOyzR0W6NmK.5.5k.PZ/zO.J7Z.J.J.Ja",
+      "role": "ADMIN"
+    }
+  ],
+  "Role": ["ADMIN", "USER"],
+  "RefreshToken": [
+    {
+      "id": "7b8c9d0e-f1a2-4c32-b1a0-d9e8f7a6b5d8",
+      "token": "refreshtoken-mock-123",
+      "userEmail": "admin@example.com",
+      "role": "ADMIN",
+      "expiryDate": "2026-05-10T00:00:00"
+    }
+  ],
+  "AppointmentStatus": ["SCHEDULED", "CANCELLED", "CONFIRMED", "REJECTED"],
+  "Status": ["PENDING", "COMPLETED", "FAILED"],
+  "BillingAccount": [
+    {
+      "id": "5b6c7d8e-9a0b-4c32-b1a0-d9e8f7a6b5c5",
+      "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+      "name": "Trần Thị B",
+      "email": "patientB@example.com",
+      "status": "ACTIVE",
+      "createdAt": "2026-04-08T08:00:00",
+      "updatedAt": "2026-04-10T08:00:00",
+      "balance": 500000,
+      "currency": "VND"
+    }
+  ],
+  "BillingTransaction": [
+    {
+      "id": "6c7d8e9f-0a1b-4c32-b1a0-d9e8f7a6b5c4",
+      "billingAccount": "5b6c7d8e-9a0b-4c32-b1a0-d9e8f7a6b5c5",
+      "type": "PAYMENT",
+      "amount": 300000,
+      "createdAt": "2026-04-10T09:30:00",
+      "completedAt": "2026-04-10T09:35:00",
+      "description": "Thanh toán khám bệnh",
+      "status": "COMPLETED"
+    }
+  ]
+}

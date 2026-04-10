@@ -30,6 +30,20 @@ public class PatientService {
   private final PatientDomainService domainService;
   private final BillingServiceGrpcClient billingServiceGrpcClient;
   private final KafkaProducer kafkaProducer;
+  private final FileStorageService fileStorageService;
+
+  /**
+   * Tải lên và cập nhật ảnh đại diện cho bệnh nhân từ tệp vật lý.
+   */
+  public void uploadImage(UUID id, org.springframework.web.multipart.MultipartFile file) {
+    Patient patient = patientRepo.findById(id)
+            .orElseThrow(() -> new PatientNotFoundException("Không tìm thấy bệnh nhân với ID: " + id));
+    String fileName = fileStorageService.storeFile(file);
+    // Ánh xạ đến URL có thể phục vụ (ví dụ: /api/patients/uploads/filename)
+    String fileUrl = "/api/patients/uploads/" + fileName;
+    patient.updateProfileImage(fileUrl);
+    patientRepo.save(patient);
+  }
 
   public List<PatientResponseDTO> getPatients() {
     return patientRepo.findAll()

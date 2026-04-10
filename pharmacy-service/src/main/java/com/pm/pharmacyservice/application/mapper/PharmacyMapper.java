@@ -19,6 +19,7 @@ public class PharmacyMapper {
         dto.setManufacturer(medicine.getManufacturer());
         dto.setPrice(medicine.getPrice());
         dto.setQuantity(medicine.getQuantity());
+        dto.setImageUrl(medicine.getImageUrl());
         return dto;
     }
 
@@ -29,6 +30,7 @@ public class PharmacyMapper {
         medicine.setManufacturer(dto.getManufacturer());
         medicine.setPrice(dto.getPrice());
         medicine.setQuantity(dto.getQuantity());
+        medicine.setImageUrl(dto.getImageUrl());
         return medicine;
     }
 

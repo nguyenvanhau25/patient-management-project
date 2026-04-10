@@ -1,0 +1,113 @@
+### 0. LOGIN AS ADMIN
+POST http://localhost:4004/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+
+> {% client.global.set("auth_token", response.body.token); %}
+
+### 1. SEED DOCTORS
+POST http://localhost:4004/api/doctors
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+  "name": "Nguyên Văn A",
+  "email": "doctorA@example.com",
+  "specialization": "Nội tổng quát",
+  "phoneNumber": "0123456789",
+  "experienceYears": 10,
+  "firstName": "Văn A",
+  "lastName": "Nguyễn",
+  "bio": "Bác sĩ nhiều kinh nghiệm",
+  "qualifications": "Bác sĩ chuyên khoa I",
+  "licenseNumber": "BS123456",
+  "location": "Hà Nội",
+  "consultationFee": 300000,
+  "rating": 4.8
+}
+
+### 2. SEED PATIENT
+POST http://localhost:4004/api/patients
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+  "name": "Trần Thị B",
+  "email": "patientB@example.com",
+  "address": "123 Đường ABC, Hà Nội",
+  "dateOfBirth": "1990-01-01"
+}
+
+### 3. SEED MEDICINES
+POST http://localhost:4004/api/pharmacy/medicines
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": "b8c9d0e1-f2a3-4c32-b1a0-d9e8f7a6b5c7",
+  "name": "Paracetamol",
+  "manufacturer": "Dược Hậu Giang",
+  "price": 15000,
+  "quantity": 100
+}
+
+### 4. CREATE DOCTOR SCHEDULE
+POST http://localhost:4004/api/doctors/1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4/schedules
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "workDate": "2026-04-10",
+  "startTime": "08:00",
+  "endTime": "12:00",
+  "isAvailable": true
+}
+
+### 5. CREATE APPOINTMENT
+POST http://localhost:4004/api/appointment
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": "a1e1b2c3-d4f5-6789-0123-456789abcdef",
+  "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+  "doctorId": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+  "appointmentDate": "2026-04-10",
+  "startTime": "09:00",
+  "endTime": "09:30",
+  "status": "SCHEDULED"
+}
+
+### 6. CREATE MEDICAL RECORD
+POST http://localhost:4004/api/medical-records
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": "b2e3f4a5-c6d7-4e3d-2c1b-0a0b0c0d0e0f",
+  "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+  "doctorId": "1f2e3d4c-5b61-4c32-b1a0-d9e8f7a6b5c4",
+  "visitDate": "2026-04-09",
+  "diagnosis": "Cảm cúm",
+  "symptoms": "Sốt, ho, đau họng",
+  "notes": "Nghỉ ngơi, uống nhiều nước"
+}
+
+### 7. CREATE BILLING ACCOUNT
+POST http://localhost:4004/api/billing/accounts
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "patientId": "7f9e8d7c-6b5a-4e3d-2c1b-0a0b0c0d0e0f",
+  "name": "Trần Thị B",
+  "email": "patientB@example.com",
+  "balance": 1000000,
+  "currency": "VND"
+}

@@ -25,4 +25,6 @@ public class Medicine {
     private BigDecimal price;
 
     private Integer quantity;
+
+    private String imageUrl;
 }

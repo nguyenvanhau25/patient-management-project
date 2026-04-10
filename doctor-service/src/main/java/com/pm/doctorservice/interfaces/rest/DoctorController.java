@@ -67,12 +67,22 @@ public class DoctorController {
     }
 
     @PatchMapping("/{id}/image")
-    @Operation(summary = "Cập nhật ảnh bác sĩ", description = "Cập nhật URL ảnh đại diện cho bác sĩ")
+    @Operation(summary = "Cập nhật ảnh bác sĩ (URL)", description = "Cập nhật URL ảnh đại diện cho bác sĩ")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<DoctorResponseDTO> updateDoctorImage(
             @PathVariable UUID id,
             @RequestBody @Valid DoctorImageRequestDTO imageRequestDTO) {
         return ResponseEntity.ok(doctorService.updateDoctorImage(id, imageRequestDTO.getProfileImageUrl()));
+    }
+
+    @PostMapping("/{id}/upload-image")
+    @Operation(summary = "Tải lên ảnh bác sĩ", description = "Tải lên tệp ảnh vật lý cho bác sĩ")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> uploadDoctorImage(
+            @PathVariable UUID id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        doctorService.uploadImage(id, file);
+        return ResponseEntity.ok("File uploaded successfully");
     }
 
     // Schedule Endpoints

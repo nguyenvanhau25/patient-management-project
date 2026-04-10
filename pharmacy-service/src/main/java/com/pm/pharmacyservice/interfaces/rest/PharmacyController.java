@@ -40,6 +40,16 @@ public class PharmacyController {
         return ResponseEntity.status(201).body(pharmacyService.addMedicine(medicineRequest));
     }
 
+    @PostMapping("/medicines/{id}/upload-image")
+    @Operation(summary = "Tải lên ảnh thuốc", description = "Tải lên tệp ảnh vật lý cho thuốc")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> uploadMedicineImage(
+            @PathVariable UUID id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        pharmacyService.uploadMedicineImage(id, file);
+        return ResponseEntity.ok("Tải ảnh lên thành công");
+    }
+
     @PostMapping("/prescriptions")
     @Operation(summary = "Tạo đơn thuốc", description = "Tạo đơn thuốc cho bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")

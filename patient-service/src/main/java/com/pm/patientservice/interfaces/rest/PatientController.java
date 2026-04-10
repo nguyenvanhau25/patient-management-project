@@ -79,12 +79,22 @@ public class PatientController {
     }
 
     @PatchMapping("/{id}/image")
-    @Operation(summary = "Cập nhật ảnh bệnh nhân")
+    @Operation(summary = "Cập nhật ảnh bệnh nhân (URL)")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<PatientResponseDTO> updatePatientImage(
             @PathVariable UUID id,
             @RequestBody @Validated PatientImageRequestDTO requestDTO) {
         return ResponseEntity.ok(patientService.updatePatientImage(id, requestDTO.getProfileImageUrl()));
+    }
+
+    @PostMapping("/{id}/upload-image")
+    @Operation(summary = "Tải lên ảnh bệnh nhân (Tệp vật lý)")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> uploadPatientImage(
+            @PathVariable UUID id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        patientService.uploadImage(id, file);
+        return ResponseEntity.ok("Tải ảnh lên thành công");
     }
 
     @GetMapping("/pdf")

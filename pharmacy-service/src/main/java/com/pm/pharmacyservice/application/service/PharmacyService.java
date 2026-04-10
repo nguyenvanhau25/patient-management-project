@@ -27,6 +27,20 @@ public class PharmacyService {
     private final DoctorClient doctorClient;
     private final PatientClient patientClient;
     private final ClinicalClient clinicalClient;
+    private final FileStorageService fileStorageService;
+
+    /**
+     * Tải lên và cập nhật ảnh cho thuốc từ tệp vật lý.
+     */
+    public void uploadMedicineImage(UUID medicineId, org.springframework.web.multipart.MultipartFile file) {
+        Medicine medicine = medicineRepository.findById(medicineId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thuốc với ID: " + medicineId));
+        String fileName = fileStorageService.storeFile(file);
+        // Ánh xạ đến URL có thể phục vụ
+        String fileUrl = "/api/pharmacy/uploads/" + fileName;
+        medicine.setImageUrl(fileUrl);
+        medicineRepository.save(medicine);
+    }
 
     public List<MedicineResponseDTO> listMedicines() {
         return medicineRepository.findAll().stream()

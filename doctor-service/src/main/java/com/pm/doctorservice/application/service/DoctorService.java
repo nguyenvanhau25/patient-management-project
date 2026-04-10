@@ -33,6 +33,16 @@ public class DoctorService {
     private final DoctorDomainRepository doctorRepository;
     private final DoctorScheduleDomainRepository doctorScheduleRepository;
     private final DoctorReviewRepository doctorReviewRepository;
+    private final FileStorageService fileStorageService;
+
+    public void uploadImage(UUID id, org.springframework.web.multipart.MultipartFile file) {
+        Doctor doctor = doctorRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ"));
+        String fileName = fileStorageService.storeFile(file);
+        // Map to a URL that can be served (e.g., /api/doctors/uploads/filename)
+        String fileUrl = "/api/doctors/uploads/" + fileName;
+        doctor.setProfileImageUrl(fileUrl);
+        doctorRepository.save(doctor);
+    }
 
     public DoctorResponseDTO addDoctor(DoctorRequestDTO request) {
         Doctor doctor = DoctorMapper.toModel(request);
