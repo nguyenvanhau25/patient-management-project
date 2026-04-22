@@ -27,8 +27,16 @@ public class MedicalRecordController {
     @PostMapping
     @Operation(summary = "Tạo hồ sơ bệnh án", description = "Bác sĩ tạo một hồ sơ bệnh án mới cho bệnh nhân")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MedicalRecordResponseDTO> createMedicalRecord(@Valid @RequestBody MedicalRecordRequestDTO request) {
+    public ResponseEntity<MedicalRecordResponseDTO> createMedicalRecord(
+            @Valid @RequestBody MedicalRecordRequestDTO request) {
         return ResponseEntity.status(201).body(medicalRecordService.create(request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lay toan bo ho so benh an", description = "Admin lay danh sach toan bo ho so lam sang")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<MedicalRecordResponseDTO>> getAllMedicalRecords() {
+        return ResponseEntity.ok(medicalRecordService.getAll());
     }
 
     @GetMapping("/patient/{patientId}")
@@ -48,7 +56,8 @@ public class MedicalRecordController {
     @PutMapping("/{id}")
     @Operation(summary = "Cập nhật hồ sơ bệnh án", description = "Cập nhật thông tin hồ sơ bệnh án theo ID")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MedicalRecordResponseDTO> update(@PathVariable UUID id, @Valid @RequestBody MedicalRecordRequestDTO payload) {
+    public ResponseEntity<MedicalRecordResponseDTO> update(@PathVariable UUID id,
+            @Valid @RequestBody MedicalRecordRequestDTO payload) {
         return ResponseEntity.ok(medicalRecordService.update(id, payload));
     }
 }

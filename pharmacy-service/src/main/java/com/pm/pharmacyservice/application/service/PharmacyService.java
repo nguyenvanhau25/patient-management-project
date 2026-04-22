@@ -55,14 +55,14 @@ public class PharmacyService {
 
     public PrescriptionResponseDTO prescribe(PrescriptionRequestDTO request) {
         if (request.getDoctorId() == null || !doctorClient.checkDoctorExists(request.getDoctorId())) {
-            throw new RuntimeException("Doctor not found: " + request.getDoctorId());
+            throw new RuntimeException("Không tìm thấy bác sĩ: " + request.getDoctorId());
         }
         if (request.getPatientId() == null || !patientClient.checkPatientExists(request.getPatientId())) {
-            throw new RuntimeException("Patient not found: " + request.getPatientId());
+            throw new RuntimeException("Không tìm thấy bệnh nhân: " + request.getPatientId());
         }
         if (request.getMedicalRecordId() != null
                 && !clinicalClient.checkMedicalRecordExists(request.getMedicalRecordId())) {
-            throw new RuntimeException("Medical record not found: " + request.getMedicalRecordId());
+            throw new RuntimeException("Không tìm thấy hồ sơ bệnh án: " + request.getMedicalRecordId());
         }
         Prescription prescription = PharmacyMapper.toModel(request);
         return PharmacyMapper.toDTO(prescriptionRepository.save(prescription));
@@ -83,7 +83,7 @@ public class PharmacyService {
                 Medicine medicine = medicineRepository.findById(item.getMedicineId())
                         .orElseThrow(() -> new RuntimeException("Medicine not found: " + item.getMedicineId()));
                 if (medicine.getQuantity() < item.getQuantity()) {
-                    throw new RuntimeException("Not enough stock for medicine " + medicine.getName());
+                    throw new RuntimeException("Không đủ số lượng thuốc " + medicine.getName());
                 }
                 medicine.setQuantity(medicine.getQuantity() - item.getQuantity());
                 medicineRepository.save(medicine);

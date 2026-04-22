@@ -33,6 +33,12 @@ public class MedicalRecordService {
         return MedicalRecordMapper.toDTO(record);
     }
 
+    public List<MedicalRecordResponseDTO> getAll() {
+        return medicalRecordRepository.findAll().stream()
+                .map(MedicalRecordMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<MedicalRecordResponseDTO> getByPatientId(UUID patientId) {
         return medicalRecordRepository.findByPatientId(patientId).stream()
                 .map(MedicalRecordMapper::toDTO)
@@ -43,10 +49,10 @@ public class MedicalRecordService {
         MedicalRecord existing = medicalRecordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Medical record not found"));
         if (update.getPatientId() != null && !patientClient.checkPatientExists(update.getPatientId())) {
-            throw new RuntimeException("Patient not found: " + update.getPatientId());
+            throw new RuntimeException("Không tìm thấy bệnh nhân: " + update.getPatientId());
         }
         if (update.getDoctorId() != null && !doctorClient.checkDoctorExists(update.getDoctorId())) {
-            throw new RuntimeException("Doctor not found: " + update.getDoctorId());
+            throw new RuntimeException("Không tìm thấy bác sĩ: " + update.getDoctorId());
         }
         if (update.getDiagnosis() != null) existing.setDiagnosis(update.getDiagnosis());
         if (update.getSymptoms() != null) existing.setSymptoms(update.getSymptoms());
@@ -61,10 +67,10 @@ public class MedicalRecordService {
 
     private void validateDependencies(UUID patientId, UUID doctorId) {
         if (patientId == null || !patientClient.checkPatientExists(patientId)) {
-            throw new RuntimeException("Patient not found: " + patientId);
+            throw new RuntimeException("Không tìm thấy bệnh nhân: " + patientId);
         }
         if (doctorId == null || !doctorClient.checkDoctorExists(doctorId)) {
-            throw new RuntimeException("Doctor not found: " + doctorId);
+            throw new RuntimeException("Không tìm thấy bác sĩ: " + doctorId);
         }
     }
 }

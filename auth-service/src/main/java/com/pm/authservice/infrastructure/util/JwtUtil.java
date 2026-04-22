@@ -46,9 +46,9 @@ public class JwtUtil {
             String role =claims.get("role", String.class);
             return role;
         } catch (SignatureException e) {
-            throw new JwtException("Invalid JWT signature");
+            throw new JwtException("Chữ ký JWT không hợp lệ");
         } catch (JwtException e) {
-            throw new JwtException("Invalid JWT");
+            throw new JwtException("JWT không hợp lệ");
         }
     }
 

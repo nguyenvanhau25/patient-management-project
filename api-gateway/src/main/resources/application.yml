@@ -44,6 +44,14 @@ spring:
           filters:
             - StripPrefix=1
 
+        # Route 4: ai-chat-public-route (Public)
+        - id: ai-chat-public-route
+          uri: http://clinical-service:4007
+          predicates:
+            - Path=/api/ai-clinical/chat
+          filters:
+            - StripPrefix=1
+
         # --- PROTECTED MAIN ROUTES ---
 
         # Route 4: patient-service
@@ -104,6 +112,14 @@ spring:
           uri: http://clinical-service:4007
           predicates:
             - Path=/api/medical-records, /api/medical-records/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        - id: clinical-ai-service-route
+          uri: http://clinical-service:4007
+          predicates:
+            - Path=/api/ai-clinical, /api/ai-clinical/**
           filters:
             - StripPrefix=1
             - JwtValidation

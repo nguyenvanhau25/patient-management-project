@@ -154,7 +154,7 @@ public class PatientService {
     title.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
     document.add(title);
 
-    PdfPTable table = new PdfPTable(4);
+    PdfPTable table = new PdfPTable(6);
     table.addCell("ID");
     table.addCell("Tên");
     table.addCell("Email");

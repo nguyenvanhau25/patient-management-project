@@ -70,8 +70,10 @@ public class BillingTransactionService {
                     .createdAt(transaction.getCreatedAt().toString())
                     .build();
             kafkaProducer.sendEvent(dto);
-
+            transaction.setStatus(Status.COMPLETED);
+            transactionRepo.save(transaction);
         }
+
         return transaction;
 
     }

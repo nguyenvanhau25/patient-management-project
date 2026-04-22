@@ -14,7 +14,7 @@ public class BillingTransactionDomainService {
     ) {
 
         if (transaction.getStatus() != Status.PENDING) {
-            throw new IllegalStateException("Transaction already processed");
+            throw new IllegalStateException("Giao dịch đã được xử lý");
         }
 
         if ("PAYMENT".equals(transaction.getType())) {

@@ -26,6 +26,11 @@ public class MedicalRecordJpaAdapter implements MedicalRecordRepository {
     }
 
     @Override
+    public List<MedicalRecord> findAll() {
+        return jpaRepository.findAll();
+    }
+
+    @Override
     public List<MedicalRecord> findByPatientId(UUID patientId) {
         return jpaRepository.findByPatientId(patientId);
     }
