@@ -1,7 +1,7 @@
 package com.pm.authservice.application.service;
 
-import com.pm.authservice.application.dto.LoginRequestDTO;
 import com.pm.authservice.application.dto.AuthResponse;
+import com.pm.authservice.application.dto.LoginRequestDTO;
 import com.pm.authservice.infrastructure.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -19,28 +19,28 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-
     public Optional<AuthResponse> authenticate(LoginRequestDTO loginRequestDTO) {
         return userService
                 .findByEmail(loginRequestDTO.getEmail())
                 .filter(u -> passwordEncoder.matches(loginRequestDTO.getPassword(), u.getPassword()))
                 .map(u -> {
-                    // Access Token chứa email + role
-                    String accessToken = jwtUtil.generateToken(
-                            u.getEmail(),
-                            u.getRole().name()
-                    );
-
-                    // Refresh Token cũng chứa email + role, lưu vào DB
+                    String accessToken = jwtUtil.generateToken(u.getEmail(), u.getRole().name());
                     String refreshToken = refreshTokenService
                             .createRefreshToken(u.getEmail(), u.getRole().name())
                             .getToken();
 
-                    return new AuthResponse(accessToken, refreshToken);
+                    return new AuthResponse(
+                            accessToken,
+                            refreshToken,
+                            u.getId().toString(),
+                            u.getEmail(),
+                            u.getRole().name(),
+                            null
+                    );
                 });
     }
 
-    public String validateToken(String token) {
+    public io.jsonwebtoken.Claims validateToken(String token) {
         try {
             return jwtUtil.validateToken(token);
         } catch (JwtException e) {
@@ -49,7 +49,6 @@ public class AuthService {
     }
 
     public Optional<String> refreshAccessToken(String refreshToken) {
-
         return refreshTokenService.findByToken(refreshToken)
                 .flatMap(refreshTokenService::verifyExpiration)
                 .map(t -> jwtUtil.generateToken(t.getUserEmail(), t.getRole()));

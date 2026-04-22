@@ -1,9 +1,27 @@
 package com.pm.apigateway.infrastructure;
 
 public class RoleResponse {
+    private String userId;
+    private String email;
     private String role;
     private int status;
     private String message;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getRole() {
         return role;

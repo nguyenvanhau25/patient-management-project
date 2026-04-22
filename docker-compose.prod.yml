@@ -1,0 +1,53 @@
+services:
+  postgres:
+    ports: []
+
+  eureka-server:
+    ports: []
+
+  auth-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  patient-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  doctor-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  clinical-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  billing-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  appointment-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  pharmacy-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  analytics-service:
+    ports: []
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  api-gateway:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  kafka:
+    ports: []

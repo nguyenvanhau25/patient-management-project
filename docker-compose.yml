@@ -37,6 +37,11 @@ services:
           memory: 400M
     ports:
       - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -47,14 +52,21 @@ services:
     ports:
       - "4004:4004"
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_PROFILES_ACTIVE: docker
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
         limits:
          memory: 300M
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4004/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -65,11 +77,11 @@ services:
     ports:
       - "4005:4005"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${AUTH_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-MzJieXRlc2VjcmV0a2V5Zm9yYXV0aG1lc2VydmljZXM=}
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -79,7 +91,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4005/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -90,11 +107,10 @@ services:
     ports:
       - "4000:4000"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${PATIENT_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -104,7 +120,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4000/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     volumes:
       - patient_uploads:/app/uploads
     networks:
@@ -117,11 +138,10 @@ services:
     ports:
       - "4003:4003"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DOCTOR_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -131,7 +151,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4003/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     volumes:
       - doctor_uploads:/app/uploads
     networks:
@@ -144,11 +169,10 @@ services:
     ports:
       - "4007:4007"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${CLINICAL_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -158,7 +182,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4007/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -169,11 +198,10 @@ services:
     ports:
       - "4001:4001"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${BILLING_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -183,7 +211,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4001/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -194,11 +227,10 @@ services:
     ports:
       - "4002:4002"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${APPOINTMENT_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -208,7 +240,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4002/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped
@@ -219,11 +256,10 @@ services:
     ports:
       - "4008:4008"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${PHARMACY_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -233,7 +269,12 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4008/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     volumes:
       - pharmacy_uploads:/app/uploads
     networks:
@@ -275,12 +316,10 @@ services:
     ports:
       - "4006:4006"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${ANALYTICS_DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JAVA_OPTS: "-Xms128m -Xmx256m -XX:+UseSerialGC -Xss256k"
     deploy:
       resources:
@@ -290,9 +329,14 @@ services:
       postgres:
         condition: service_healthy
       eureka-server:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4006/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - pm-network
     restart: unless-stopped

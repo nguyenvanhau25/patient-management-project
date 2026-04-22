@@ -19,15 +19,28 @@ import java.util.List;
 public class RoleHeaderFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal
-            (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String role = request.getHeader("X-Role");
-        if(role != null) {
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String role = request.getHeader("X-User-Role");
+        if (role == null || role.isBlank()) {
+            role = request.getHeader("X-Role");
+        }
+
+        String principal = request.getHeader("X-User-Email");
+        if (principal == null || principal.isBlank()) {
+            principal = request.getHeader("X-User-Id");
+        }
+        if (principal == null || principal.isBlank()) {
+            principal = "gateway-user";
+        }
+
+        if (role != null && !role.isBlank()) {
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-            Authentication auth = new UsernamePasswordAuthenticationToken("gateway-user", null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
+
         filterChain.doFilter(request, response);
-        // dọc role và gán vào security context
     }
 }

@@ -37,14 +37,12 @@ public class JwtUtil {
                 .compact();
     }
     //xác thực token
-    public String validateToken(String token) {
+    public Claims validateToken(String token) {
         try {
             Jws<Claims> jwt = Jwts.parser().verifyWith((SecretKey) secretKey)
                     .build()
                     .parseSignedClaims(token);
-            Claims claims = jwt.getPayload();
-            String role =claims.get("role", String.class);
-            return role;
+            return jwt.getPayload();
         } catch (SignatureException e) {
             throw new JwtException("Chữ ký JWT không hợp lệ");
         } catch (JwtException e) {

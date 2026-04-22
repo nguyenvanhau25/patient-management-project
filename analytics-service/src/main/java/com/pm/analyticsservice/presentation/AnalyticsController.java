@@ -1,5 +1,6 @@
 package com.pm.analyticsservice.presentation;
 
+import com.pm.analyticsservice.application.dto.TopPatientDTO;
 import com.pm.analyticsservice.application.service.AnalyticsService;
 import com.pm.analyticsservice.application.service.BillingApplicationService;
 import com.pm.analyticsservice.domain.model.PatientAnalytics;
@@ -44,7 +45,7 @@ public class AnalyticsController {
         return ResponseEntity.ok(ApiResponse.<Long>builder()
                 .code("SUCCESS")
                 .message("Thành công")
-                .result(n)
+                .data(n)
                 .build());
     }
 
@@ -69,7 +70,7 @@ public class AnalyticsController {
                 ApiResponse.<List<PatientAnalytics>>builder()
                         .code("SUCCESS")
                         .message("Thành công")
-                        .result(patients)
+                        .data(patients)
                         .build()
         );
     }
@@ -85,44 +86,52 @@ public class AnalyticsController {
                 ApiResponse.<Double>builder()
                         .code("SUCCESS")
                         .message("Thành công")
-                        .result(rate)
+                        .data(rate)
                         .build()
         );
     }
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tổng doanh thu theo ngày")
     @GetMapping("/revenue")
-    public ResponseEntity<Double> getTotalRevenue(@RequestParam String date) {
-        return ResponseEntity.ok(
-                billingService.getTotalRevenue(LocalDate.parse(date))
-        );
+    public ResponseEntity<ApiResponse<Double>> getTotalRevenue(@RequestParam String date) {
+        Double revenue = billingService.getTotalRevenue(LocalDate.parse(date));
+        return ResponseEntity.ok(ApiResponse.<Double>builder()
+                .code("SUCCESS")
+                .data(revenue)
+                .build());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Top patient chi tiêu nhiều nhất")
     @GetMapping("/top-patient")
-    public ResponseEntity<List<Object[]>> topPatient(@RequestParam int limit) {
-        return ResponseEntity.ok(
-                billingService.getTopPatientSpending(limit)
-        );
+    public ResponseEntity<ApiResponse<List<TopPatientDTO>>> topPatient(@RequestParam(defaultValue = "10") int limit) {
+        List<TopPatientDTO> list = billingService.getTopPatientSpending(limit);
+        return ResponseEntity.ok(ApiResponse.<List<TopPatientDTO>>builder()
+                .code("SUCCESS")
+                .data(list)
+                .build());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tổng số giao dịch thành công")
     @GetMapping("/completed/count")
-    public ResponseEntity<Long> countCompleted() {
-        return ResponseEntity.ok(
-                billingService.countCompletedTransactions()
-        );
+    public ResponseEntity<ApiResponse<Long>> countCompleted() {
+        Long count = billingService.countCompletedTransactions();
+        return ResponseEntity.ok(ApiResponse.<Long>builder()
+                .code("SUCCESS")
+                .data(count)
+                .build());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Doanh thu theo bệnh nhân")
     @GetMapping("/revenue/patient/{patientId}")
-    public ResponseEntity<Double> revenueByPatient(@PathVariable String patientId) {
-        return ResponseEntity.ok(
-                billingService.getRevenueByPatientId(patientId)
-        );
+    public ResponseEntity<ApiResponse<Double>> revenueByPatient(@PathVariable String patientId) {
+        Double revenue = billingService.getRevenueByPatientId(patientId);
+        return ResponseEntity.ok(ApiResponse.<Double>builder()
+                .code("SUCCESS")
+                .data(revenue)
+                .build());
     }
 
 }

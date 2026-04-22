@@ -27,4 +27,18 @@ logs/
 Thumbs.db
 
 # Node
-**/node_modules/
+**/node_modules/
+
+# Docs / temp files
+*.md
+
+
+*.json
+
+# SQL files
+*.sql
+
+
+# Temporary files
+*.tmp
+*.temp

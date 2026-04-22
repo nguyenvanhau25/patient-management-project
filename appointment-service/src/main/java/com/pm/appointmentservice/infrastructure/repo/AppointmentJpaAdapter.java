@@ -6,6 +6,7 @@ import com.pm.appointmentservice.infrastructure.repo.jpa.AppointmentJpaRepositor
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,5 +22,25 @@ public class AppointmentJpaAdapter implements AppointmentRepository {
     @Override
     public Optional<Appointment> findById(UUID id) {
         return appointmentJpaRepository.findById(id);
+    }
+
+    @Override
+    public List<Appointment> findAll() {
+        return appointmentJpaRepository.findAll();
+    }
+
+    @Override
+    public List<Appointment> findByPatientId(UUID patientId) {
+        return appointmentJpaRepository.findByPatientId(patientId);
+    }
+
+    @Override
+    public List<Appointment> findByDoctorId(UUID doctorId) {
+        return appointmentJpaRepository.findByDoctorId(doctorId);
+    }
+
+    @Override
+    public List<Appointment> findByStatus(String status) {
+        return appointmentJpaRepository.findByStatus(status);
     }
 }

@@ -4,11 +4,8 @@ import com.pm.billingservice.application.service.BillingAccountService;
 import com.pm.billingservice.application.service.BillingTransactionService;
 import com.pm.billingservice.domain.model.account.BillingAccount;
 import com.pm.billingservice.domain.model.transaction.BillingTransaction;
-import com.pm.billingservice.infrastructure.exception.AppException;
-import com.pm.billingservice.infrastructure.exception.ErrorCode;
-import com.pm.billingservice.interfaces.dto.BillingAccountResponse;
-import com.pm.billingservice.interfaces.dto.CreateBillingAccountRequest;
-import com.pm.billingservice.interfaces.dto.CreateTransactionRequest;
+import com.pm.billingservice.infrastructure.exception.ApiResponse;
+import com.pm.billingservice.interfaces.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,38 +35,41 @@ public class BillingAccountController {
     @PostMapping("/accounts")
     @Operation(summary = "Tạo tài khoản Billing mới")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingAccount>
-    createBillingAccount(@Valid @RequestBody CreateBillingAccountRequest request) {
-
+    public ResponseEntity<ApiResponse<BillingAccount>> createBillingAccount(@Valid @RequestBody CreateBillingAccountRequest request) {
         BillingAccount account = billingAccountService.createBillingAccount(
                 request.getPatientId(),
                 request.getName(),
                 request.getEmail()
         );
-        if (account == null) {
-            throw new AppException(ErrorCode.INTERNAL_ERROR);
-        }
-        return ResponseEntity.ok(account);
+        return ResponseEntity.ok(ApiResponse.success(account));
     }
 
     // 2. xem thông tin account
     @GetMapping("/accounts/{accountId}")
     @Operation(summary = "Lấy thông tin BillingAccount theo ID")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingAccountResponse> getBillingAccount(@PathVariable UUID accountId) {
+    public ResponseEntity<ApiResponse<BillingAccountResponse>> getBillingAccount(@PathVariable UUID accountId) {
         BillingAccountResponse response = billingAccountService.getBillingAccount(accountId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/accounts/patient/{patientId}")
+    @Operation(summary = "Lấy thông tin BillingAccount theo patientId")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<ApiResponse<BillingAccountResponse>> getAccountByPatientId(@PathVariable String patientId) {
+        BillingAccountResponse response = billingAccountService.getAccountByPatientId(patientId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     // 3. Cập nhật trạng thái Account (ADMIN)
     @PatchMapping("/accounts/{accountId}/status")
     @Operation(summary = "Cập nhật trạng thái BillingAccount")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingAccount>
-    updateAccountStatus(@PathVariable UUID accountId,
-                        @RequestParam @NotBlank(message = "Trạng thái là bắt buộc") String status) {
-        BillingAccount account = billingAccountService.updateAccountStatus(accountId, status);
-        return ResponseEntity.ok(account);
+    public ResponseEntity<ApiResponse<BillingAccount>> updateAccountStatus(
+            @PathVariable UUID accountId,
+            @RequestBody StatusUpdateRequest request) {
+        BillingAccount account = billingAccountService.updateAccountStatus(accountId, request.getStatus());
+        return ResponseEntity.ok(ApiResponse.success(account));
     }
 
     // 4. Xóa account (ADMIN)
@@ -86,52 +86,46 @@ public class BillingAccountController {
     @PostMapping("/accounts/{accountId}/transactions")
     @Operation(summary = "Tạo giao dịch cho Billing Account")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingTransaction> createTransaction(@PathVariable UUID accountId,
-                                                                @Valid @RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<ApiResponse<BillingTransaction>> createTransaction(
+            @PathVariable UUID accountId,
+            @Valid @RequestBody CreateTransactionRequest request) {
         BillingTransaction transaction = billingTransactionService.createTransaction(
                 accountId,
                 request.getAmount(),
                 request.getType(),
                 request.getDescription()
         );
-        if (transaction == null) {
-            throw new AppException(ErrorCode.TRANSACTION_NOT_FOUND);
-        }
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(ApiResponse.success(transaction));
     }
 
     // Lấy lịch sử transaction (USER + ADMIN)
     @GetMapping("/accounts/{accountId}/transactions")
     @Operation(summary = "Lấy danh sách transaction theo account ID")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<List<BillingTransaction>>
-    getTransactions(@PathVariable UUID accountId) {
-        List<BillingTransaction> transactions =
-                billingTransactionService.getTransactions(accountId);
-        return ResponseEntity.ok(transactions);
+    public ResponseEntity<ApiResponse<List<BillingTransaction>>> getTransactions(@PathVariable UUID accountId) {
+        List<BillingTransaction> transactions = billingTransactionService.getTransactions(accountId);
+        return ResponseEntity.ok(ApiResponse.success(transactions));
     }
 
     //Update trạng thái transaction (ADMIN)
     @PatchMapping("/transactions/{transactionId}/status")
     @Operation(summary = "Cập nhật trạng thái giao dịch")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BillingTransaction>
-    updateTransactionStatus(@PathVariable UUID transactionId,
-                            @RequestParam @NotBlank(message = "Trạng thái là bắt buộc") String status) {
-        BillingTransaction transaction = billingTransactionService
-                .updateTransactionStatus(transactionId, status);
-
-        return ResponseEntity.ok(transaction);
+    public ResponseEntity<ApiResponse<BillingTransaction>> updateTransactionStatus(
+            @PathVariable UUID transactionId,
+            @RequestBody StatusUpdateRequest request) {
+        BillingTransaction transaction = billingTransactionService.updateTransactionStatus(transactionId, request.getStatus());
+        return ResponseEntity.ok(ApiResponse.success(transaction));
     }
     // nạp tiền vào tài khoản
     @PatchMapping("/accounts/{accountId}/recharge")
     @Operation(summary = "Nạp tiền vào tài khoản")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<BillingAccount> recharge
-    (@PathVariable UUID accountId, @RequestBody @NotNull(message = "Số tiền là bắt buộc") @DecimalMin(value = "0.0", inclusive = false, message = "Số tiền phải lớn hơn 0") Double money){
-     BillingAccount billingAccount = billingAccountService.recharge(accountId, money);
-
-     return ResponseEntity.ok(billingAccount);
+    public ResponseEntity<ApiResponse<BillingAccount>> recharge(
+            @PathVariable UUID accountId,
+            @RequestBody RechargeRequest request) {
+        BillingAccount billingAccount = billingAccountService.recharge(accountId, request.getAmount());
+        return ResponseEntity.ok(ApiResponse.success(billingAccount));
     }
 
 }

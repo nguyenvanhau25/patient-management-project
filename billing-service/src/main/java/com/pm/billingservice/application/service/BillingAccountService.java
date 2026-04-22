@@ -30,9 +30,18 @@ public class BillingAccountService {
 
     //  Lấy thông tin account
     public BillingAccountResponse getBillingAccount(UUID accountId) {
-
         BillingAccount account = accountRepo.findById(accountId)
                 .orElseThrow(() -> new AppException(ErrorCode.BILLING_ACCOUNT_NOT_FOUND));
+        return mapToResponse(account);
+    }
+
+    public BillingAccountResponse getAccountByPatientId(String patientId) {
+        BillingAccount account = accountRepo.findByPatientId(patientId)
+                .orElseThrow(() -> new AppException(ErrorCode.BILLING_ACCOUNT_NOT_FOUND));
+        return mapToResponse(account);
+    }
+
+    private BillingAccountResponse mapToResponse(BillingAccount account) {
         PatientResponseDTO dto = patientClient.getPatientDetails(UUID.fromString(account.getPatientId()));
         return BillingAccountResponse.builder()
                 .id(account.getId())

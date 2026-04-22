@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name = "patient-service", url = "http://patient-service:4000")
+@FeignClient(name = "patient-service", url = "${services.patient.url}")
 public interface PatientClient {
     @GetMapping("/internal/patient/{id}")
     boolean checkPatientExits(@PathVariable("id") UUID patientId);

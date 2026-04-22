@@ -14,7 +14,7 @@ public interface BillingService {
     Double getTotalRevenue(LocalDate date);
 
     //  TOP PATIENT CHI TIÊU NHIỀU NHẤT
-    List<Object[]> getTopPatientSpending(int limit);
+    List<com.pm.analyticsservice.application.dto.TopPatientDTO> getTopPatientSpending(int limit);
 
     //  TỔNG SỐ GIAO DỊCH THÀNH CÔNG
     Long countCompletedTransactions();

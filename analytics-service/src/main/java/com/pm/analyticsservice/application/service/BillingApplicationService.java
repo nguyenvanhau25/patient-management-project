@@ -1,6 +1,7 @@
 package com.pm.analyticsservice.application.service;
 
 import billing.events.BillingEvent;
+import com.pm.analyticsservice.application.dto.TopPatientDTO;
 import com.pm.analyticsservice.application.interfaces.BillingService;
 import com.pm.analyticsservice.domain.model.BillingAnalytics;
 import com.pm.analyticsservice.domain.repository.BillingDomainAnalyticsRepository;
@@ -46,7 +47,7 @@ public class BillingApplicationService implements BillingService {
     }
 // top doanh thu theo bệnh nhân
     @Override
-    public List<Object[]> getTopPatientSpending(int limit) {
+    public List<TopPatientDTO> getTopPatientSpending(int limit) {
 
         Map<String, Double> revenueByPatient =
                 domainService.calculateRevenueByPatient(
@@ -57,7 +58,10 @@ public class BillingApplicationService implements BillingService {
                 .stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
                 .limit(limit)
-                .map(e -> new Object[]{e.getKey(), e.getValue()})
+                .map(e -> TopPatientDTO.builder()
+                        .patientId(e.getKey())
+                        .totalSpent(e.getValue())
+                        .build())
                 .toList();
     }
 // tổng giao dịch thành công

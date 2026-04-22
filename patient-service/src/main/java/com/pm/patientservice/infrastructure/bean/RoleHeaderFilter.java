@@ -16,27 +16,36 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class RoleHeaderFilter  extends OncePerRequestFilter {
+public class RoleHeaderFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
-        System.out.println("Path: " + path);
-        // Bypass nội bộ: không yêu cầu role khi gọi internal API
         if (path.startsWith("/internal")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String role = request.getHeader("X-Role");
-        if (role != null) {
+        String role = request.getHeader("X-User-Role");
+        if (role == null || role.isBlank()) {
+            role = request.getHeader("X-Role");
+        }
+
+        String principal = request.getHeader("X-User-Email");
+        if (principal == null || principal.isBlank()) {
+            principal = request.getHeader("X-User-Id");
+        }
+        if (principal == null || principal.isBlank()) {
+            principal = "gateway-user";
+        }
+
+        if (role != null && !role.isBlank()) {
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-            Authentication auth = new UsernamePasswordAuthenticationToken("gateway-user", null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);
     }
-    // đọc thông tin role từ header http và set vào security context
 }

@@ -1,6 +1,7 @@
 package com.pm.appointmentservice.interfaces.rest;
 
 import com.pm.appointmentservice.application.dto.AppointmentRequest;
+import com.pm.appointmentservice.application.dto.RescheduleRequest;
 import com.pm.appointmentservice.application.dto.AppointmentResponse;
 import com.pm.appointmentservice.application.service.AppointmentService;
 import com.pm.appointmentservice.domain.model.Appointment;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
+
+import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,21 @@ import java.util.UUID;
 public class AppointmentController {
     private final AppointmentService appointmentService;
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @Operation(summary = "Lấy danh sách lịch hẹn")
+    public ResponseEntity<ApiResponse<List<Appointment>>> listAppointments(
+            @RequestParam(required = false) UUID patientId,
+            @RequestParam(required = false) UUID doctorId,
+            @RequestParam(required = false) String status) {
+        List<Appointment> list = appointmentService.getAllAppointments(patientId, doctorId, status);
+        return ResponseEntity.ok(ApiResponse.<List<Appointment>>builder()
+                .code("SUCCESS")
+                .message("Lấy danh sách lịch hẹn thành công")
+                .data(list)
+                .build());
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @Operation(summary = "Tạo lịch hẹn")
@@ -37,7 +55,7 @@ public class AppointmentController {
                 .body(ApiResponse.<Appointment>builder()
                         .code("SUCCESS")
                         .message("Tạo lịch hẹn thành công")
-                        .result(appt)
+                        .data(appt)
                         .build());
     }
 
@@ -52,7 +70,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.<Appointment>builder()
                 .code("SUCCESS")
                 .message("Hủy lịch hẹn thành công")
-                .result(appt)
+                .data(appt)
                 .build());
     }
 
@@ -69,7 +87,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.<AppointmentResponse>builder()
                 .code("SUCCESS")
                 .message("Lấy thông tin lịch hẹn thành công")
-                .result(response)
+                .data(response)
                 .build());
     }
 
@@ -87,7 +105,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.<String>builder()
                 .code("SUCCESS")
                 .message("Xác nhận lịch hẹn thành công")
-                .result("Xác nhận lịch hẹn thành công")
+                .data("Xác nhận lịch hẹn thành công")
                 .build());
     }
 
@@ -104,7 +122,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.<String>builder()
                 .code("SUCCESS")
                 .message("Từ chối lịch hẹn thành công")
-                .result("Đã từ chối lịch hẹn")
+                .data("Đã từ chối lịch hẹn")
                 .build());
     }
 
@@ -113,16 +131,14 @@ public class AppointmentController {
     @Operation(summary = "Đổi lịch hẹn")
     public ResponseEntity<ApiResponse<String>> reschedule(
             @PathVariable UUID id,
-            @RequestParam String appointmentDate,
-            @RequestParam String startTime,
-            @RequestParam String endTime) {
+            @RequestBody RescheduleRequest request) {
         LocalDate newDate;
         LocalTime newStart;
         LocalTime newEnd;
         try {
-            newDate = LocalDate.parse(appointmentDate);
-            newStart = LocalTime.parse(startTime);
-            newEnd = LocalTime.parse(endTime);
+            newDate = LocalDate.parse(request.getAppointmentDate());
+            newStart = LocalTime.parse(request.getStartTime());
+            newEnd = LocalTime.parse(request.getEndTime());
         } catch (Exception e) {
             throw new AppException(ErrorCode.INVALID_DATE_FORMAT);
         }
@@ -131,7 +147,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.<String>builder()
                 .code("SUCCESS")
                 .message("Đổi lịch hẹn thành công")
-                .result("Lịch hẹn đã được dời lịch thành công")
+                .data("Lịch hẹn đã được dời lịch thành công")
                 .build());
     }
 }

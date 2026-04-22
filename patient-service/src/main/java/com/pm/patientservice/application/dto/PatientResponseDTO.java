@@ -6,11 +6,11 @@ import lombok.Setter;
 @Setter
 @Getter
 public class PatientResponseDTO {
-  private String id;
-  private String name;
-  private String email;
-  private String address;
-  private String dateOfBirth;
-  private String profileImageUrl;
-
+    private String id;
+    private String name;
+    private String email;
+    private String address;
+    private String dateOfBirth;
+    private String registeredDate;
+    private String profileImageUrl;
 }

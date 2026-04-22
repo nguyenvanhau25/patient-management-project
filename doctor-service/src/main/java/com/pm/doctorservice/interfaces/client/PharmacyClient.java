@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@FeignClient(name = "pharmacy-service", url = "http://pharmacy-service:4005")
+@FeignClient(name = "pharmacy-service", url = "${services.pharmacy.url}")
 public interface PharmacyClient {
     @GetMapping("/pharmacy/medicines")
     List<Map<String, Object>> listMedicines();

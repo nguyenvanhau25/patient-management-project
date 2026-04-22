@@ -1,0 +1,20 @@
+services:
+  auth:
+    url: ${AUTH_SERVICE_URL}
+  patient:
+    url: ${PATIENT_SERVICE_URL}
+  doctor:
+    url: ${DOCTOR_SERVICE_URL}
+  clinical:
+    url: ${CLINICAL_SERVICE_URL}
+  pharmacy:
+    url: ${PHARMACY_SERVICE_URL}
+  billing:
+    url: ${BILLING_SERVICE_URL}
+  appointment:
+    url: ${APPOINTMENT_SERVICE_URL}
+  analytics:
+    url: ${ANALYTICS_SERVICE_URL}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}

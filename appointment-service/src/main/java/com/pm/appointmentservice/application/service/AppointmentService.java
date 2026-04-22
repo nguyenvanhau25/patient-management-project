@@ -41,7 +41,7 @@ public class AppointmentService {
             throw new RuntimeException("Không tìm thấy thông tin bệnh nhân");
         }
 
-        DoctorResponseDTO doctor = doctorClient.getDoctorById(req.getDoctorId());
+        DoctorResponseDTO doctor = doctorClient.getDoctorById(req.getDoctorId()).getData();
         if (doctor == null) {
             throw new RuntimeException("Không tìm thấy thông tin bác sĩ");
         }
@@ -57,7 +57,7 @@ public class AppointmentService {
             throw new IllegalArgumentException("Định dạng ngày/giờ không hợp lệ. Sử dụng yyyy-MM-dd và HH:mm");
         }
 
-        List<DoctorScheduleDTO> availableSchedules = doctorClient.getDoctorSchedules(req.getDoctorId(), date);
+        List<DoctorScheduleDTO> availableSchedules = doctorClient.getDoctorSchedules(req.getDoctorId(), date).getData();
         boolean hasSlot = availableSchedules.stream()
                 .anyMatch(s -> Boolean.TRUE.equals(s.getIsAvailable())
                         && !s.getStartTime().isAfter(startTime)
@@ -124,6 +124,19 @@ public class AppointmentService {
     }
 
 
+
+    public List<Appointment> getAllAppointments(UUID patientId, UUID doctorId, String status) {
+        if (patientId != null) {
+            return appointmentRepository.findByPatientId(patientId);
+        }
+        if (doctorId != null) {
+            return appointmentRepository.findByDoctorId(doctorId);
+        }
+        if (status != null && !status.isEmpty()) {
+            return appointmentRepository.findByStatus(status);
+        }
+        return appointmentRepository.findAll();
+    }
 
     public void rescheduleAppointment(UUID id, LocalDate newDate, LocalTime newStartTime, LocalTime newEndTime) {
         Appointment ap = appointmentRepository.findById(id).orElse(null);

@@ -1,21 +1,27 @@
 package com.pm.authservice.interfaces;
 
-import com.pm.authservice.application.dto.LoginRequestDTO;
 import com.pm.authservice.application.dto.AuthResponse;
+import com.pm.authservice.application.dto.LoginRequestDTO;
 import com.pm.authservice.application.service.AuthService;
 import com.pm.authservice.application.service.RefreshTokenService;
 import com.pm.authservice.application.service.UserService;
-import com.pm.authservice.domain.RefreshToken;
 import com.pm.authservice.domain.User;
-import com.pm.authservice.infrastructure.exception.RefreshTokenNotFoundException;
 import com.pm.authservice.infrastructure.exception.UserAlreadyExistsException;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,117 +31,112 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@RequestMapping
 public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
 
-
     @PostMapping("/login")
-    @Operation(summary = "Đăng nhập & tạo access + refresh token")
+    @Operation(summary = "Dang nhap va tao access + refresh token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequestDTO request) {
-
         Optional<AuthResponse> authResponse = authService.authenticate(request);
-
         return authResponse
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(401).build());
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
-
     @PostMapping("/signup")
-    @Operation(summary = "Đăng ký người dùng")
+    @Operation(summary = "Dang ky nguoi dung")
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
-
         if (userService.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail());
         }
-
 
         userService.createUser(user);
         return ResponseEntity.ok(user);
     }
 
-    //  kiểm tra token
-    @Operation(summary = "Xác thực Access Token & trả về quyền (role)")
     @GetMapping("/validate")
+    @Operation(summary = "Xac thuc access token va tra ve identity")
     public ResponseEntity<Map<String, Object>> validateToken(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         Map<String, Object> response = new HashMap<>();
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
-            response.put("error", "Thiếu hoặc sai định dạng header Authorization");
+            response.put("error", "Thieu hoac sai dinh dang header Authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         String token = authHeader.substring(7);
-        String role = authService.validateToken(token);
-
-        if (role == null) {
+        Claims claims = authService.validateToken(token);
+        if (claims == null) {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
-            response.put("error", "Token không hợp lệ");
+            response.put("error", "Token khong hop le");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
+        String email = claims.getSubject();
+        Optional<User> user = userService.findByEmail(email);
+
         response.put("status", HttpStatus.OK.value());
-        response.put("message", "Token hợp lệ");
-        response.put("role", role);
+        response.put("message", "Token hop le");
+        response.put("role", claims.get("role", String.class));
+        response.put("email", email);
+        response.put("userId", user.map(u -> u.getId().toString()).orElse(null));
+        response.put("fullName", null);
         return ResponseEntity.ok(response);
     }
 
-    // refresh token
     @PostMapping("/refresh")
-    @Operation(summary = "Tạo access token mới bằng refresh token")
-    public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
-
-        Optional<RefreshToken> tokenEntity = refreshTokenService.findByToken(refreshToken);
-
-        if (tokenEntity.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Refresh token đã hết hạn hoặc không hợp lệ");
+    @Operation(summary = "Tao access token moi bang refresh token")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thieu refreshToken"));
         }
 
-        return ResponseEntity.ok(Map.of("accessToken", tokenEntity.get()));
+        return authService.refreshAccessToken(refreshToken)
+                .map(token -> ResponseEntity.ok(Map.of("accessToken", token)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Refresh token da het han hoac khong hop le")));
     }
+
     @DeleteMapping("/logout")
-    @Operation(summary = "đăng xuất")
-    public ResponseEntity<String> logout(@RequestParam String refreshToken) {
-        boolean deleted = refreshTokenService.deleteByToken(refreshToken);
-        if (!deleted) throw new RefreshTokenNotFoundException(refreshToken);
-        return ResponseEntity.ok("Xóa refresh token thành công");
-    }
-
-    // 6 đăng xuất tất cả
-    @DeleteMapping("/logout/all")
-    @Operation(summary = "đăng xuất tất cả")
-    public ResponseEntity<String> logoutAll(@RequestParam String email) {
-        boolean deleted = refreshTokenService.deleteByEmail(email);
-        if (deleted) {
-            return ResponseEntity.ok("Đã xóa tất cả refresh token của người dùng: " + email);
+    @Operation(summary = "Dang xuat")
+    public ResponseEntity<String> logout(@RequestParam(required = false) String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.ok("Khong co token de xoa");
         }
-        return ResponseEntity.status(404).body("Không tìm thấy refresh token nào của người dùng: " + email);
+        refreshTokenService.deleteByToken(refreshToken);
+        return ResponseEntity.ok("Xoa refresh token thanh cong");
     }
 
-    // 7 reset/change password
+    @DeleteMapping("/logout/all")
+    @Operation(summary = "Dang xuat tat ca")
+    public ResponseEntity<String> logoutAll(@RequestParam(required = false) String email) {
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Thieu email");
+        }
+        refreshTokenService.deleteByEmail(email);
+        return ResponseEntity.ok("Da xoa tat ca refresh token cua nguoi dung: " + email);
+    }
+
     @PostMapping("/reset")
-    @Operation(summary = "reset/change password ")
+    @Operation(summary = "Reset/change password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody LoginRequestDTO change) {
         boolean reset = userService.resetPassword(change);
         if (reset) {
-            return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+            return ResponseEntity.ok("Dat lai mat khau thanh cong");
         }
-        return ResponseEntity.status(404).body("Đặt lại mật khẩu thất bại");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Dat lai mat khau that bai");
     }
 
-    // 8 xem tất cả danh sách user
     @GetMapping("/user")
-    @Operation(summary = "xem danh sách user")
-    public ResponseEntity<List<User>> getAll(){
+    @Operation(summary = "Xem danh sach user")
+    public ResponseEntity<List<User>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
-
-    }
-
+}
