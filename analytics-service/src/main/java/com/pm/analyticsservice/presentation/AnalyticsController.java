@@ -1,6 +1,8 @@
 package com.pm.analyticsservice.presentation;
 
+import com.pm.analyticsservice.application.dto.PatientAnalyticsResponse;
 import com.pm.analyticsservice.application.dto.TopPatientDTO;
+import com.pm.analyticsservice.application.mapper.AnalyticsMapper;
 import com.pm.analyticsservice.application.service.AnalyticsService;
 import com.pm.analyticsservice.application.service.BillingApplicationService;
 import com.pm.analyticsservice.domain.model.PatientAnalytics;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/analytics")
@@ -52,7 +55,7 @@ public class AnalyticsController {
     @GetMapping("/patients")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @Operation(summary = "lấy danh sách bệnh nhân đăng kí mới theo ngày")
-    public ResponseEntity<ApiResponse<List<PatientAnalytics>>> getPatients(@RequestParam String date) {
+    public ResponseEntity<ApiResponse<List<PatientAnalyticsResponse>>> getPatients(@RequestParam String date) {
         LocalDate localDate;
         try {
             localDate = LocalDate.parse(date);
@@ -66,11 +69,15 @@ public class AnalyticsController {
             throw new AppException(ErrorCode.PATIENT_NOT_FOUND, "Không có bệnh nhân đăng ký trong ngày này");
         }
 
+        List<PatientAnalyticsResponse> response = patients.stream()
+                .map(AnalyticsMapper::toResponse)
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok(
-                ApiResponse.<List<PatientAnalytics>>builder()
+                ApiResponse.<List<PatientAnalyticsResponse>>builder()
                         .code("SUCCESS")
                         .message("Thành công")
-                        .data(patients)
+                        .data(response)
                         .build()
         );
     }

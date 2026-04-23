@@ -16,34 +16,39 @@ public class GlobalExceptionHandler {
       GlobalExceptionHandler.class);
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, String>> handleValidationException(
+  public ResponseEntity<ApiResponse<Void>> handleValidationException(
       MethodArgumentNotValidException ex) {
 
     Map<String, String> errors = new HashMap<>();
-
     ex.getBindingResult().getFieldErrors().forEach(
         error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-    return ResponseEntity.badRequest().body(errors);
+    return ResponseEntity.badRequest().body(ApiResponse.<Void>builder()
+            .code("VALIDATION_ERROR")
+            .message("Lỗi dữ liệu đầu vào")
+            .details(errors)
+            .build());
   }
 
   @ExceptionHandler(EmailAlreadyExistsException.class)
-  public ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(
+  public ResponseEntity<ApiResponse<Void>> handleEmailAlreadyExistsException(
       EmailAlreadyExistsException ex) {
 
     log.warn("Email address already exist {}", ex.getMessage());
-    Map<String, String> errors = new HashMap<>();
-    errors.put("message", "Email address already exists");
-    return ResponseEntity.badRequest().body(errors);
+    return ResponseEntity.badRequest().body(ApiResponse.<Void>builder()
+            .code("EMAIL_EXISTS")
+            .message("Email address already exists")
+            .build());
   }
 
   @ExceptionHandler(PatientNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handlePatientNotFoundException(
+  public ResponseEntity<ApiResponse<Void>> handlePatientNotFoundException(
       PatientNotFoundException ex) {
     log.warn("Patient not found {}", ex.getMessage());
 
-    Map<String, String> errors = new HashMap<>();
-    errors.put("message", "Patient not found");
-    return ResponseEntity.badRequest().body(errors);
+    return ResponseEntity.badRequest().body(ApiResponse.<Void>builder()
+            .code("PATIENT_NOT_FOUND")
+            .message("Patient not found")
+            .build());
   }
 }

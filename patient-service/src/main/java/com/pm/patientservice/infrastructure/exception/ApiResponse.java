@@ -1,4 +1,4 @@
-package com.pm.billingservice.infrastructure.exception;
+package com.pm.patientservice.infrastructure.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
