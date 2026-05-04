@@ -2,7 +2,7 @@ services:
 
   postgres:
     image: postgres:latest
-    container_name: pm-postgres
+    container_name: postgres
     deploy:
       resources:
         limits:

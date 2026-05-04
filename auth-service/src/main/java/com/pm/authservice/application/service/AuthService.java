@@ -20,11 +20,32 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
 
     public Optional<AuthResponse> authenticate(LoginRequestDTO loginRequestDTO) {
+
         return userService
                 .findByEmail(loginRequestDTO.getEmail())
-                .filter(u -> passwordEncoder.matches(loginRequestDTO.getPassword(), u.getPassword()))
                 .map(u -> {
+
+                    System.out.println("=== LOGIN DEBUG ===");
+                    System.out.println("EMAIL: " + loginRequestDTO.getEmail());
+                    System.out.println("RAW PASSWORD: " + loginRequestDTO.getPassword());
+                    System.out.println("HASH IN DB: " + u.getPassword());
+
+                    boolean match = passwordEncoder.matches(
+                            loginRequestDTO.getPassword(),
+                            u.getPassword()
+                    );
+
+                    System.out.println("PASSWORD MATCH: " + match);
+
+                    if (!match) {
+                        System.out.println("LOGIN FAILED - PASSWORD NOT MATCH");
+                        return null;
+                    }
+
+                    System.out.println("LOGIN SUCCESS");
+
                     String accessToken = jwtUtil.generateToken(u.getEmail(), u.getRole().name());
+
                     String refreshToken = refreshTokenService
                             .createRefreshToken(u.getEmail(), u.getRole().name())
                             .getToken();
@@ -37,7 +58,8 @@ public class AuthService {
                             u.getRole().name(),
                             null
                     );
-                });
+                })
+                .flatMap(Optional::ofNullable);
     }
 
     public io.jsonwebtoken.Claims validateToken(String token) {

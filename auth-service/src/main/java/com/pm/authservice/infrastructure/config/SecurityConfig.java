@@ -15,6 +15,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers(
@@ -30,9 +31,9 @@ public class SecurityConfig {
                                 "/refresh",
                                 "/logout",
                                 "/logout/all",
-                                "/reset"
+                                "/reset",
+                                "/h2-console/**"
                         ).permitAll()
-                        // Only ADMIN can access /user
                         .requestMatchers("/user").hasRole("ADMIN")
 
                         .anyRequest().authenticated()

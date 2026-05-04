@@ -3,13 +3,13 @@ server:
 
 spring:
   profiles:
-    default: local
+    default: docker
   cloud:
     gateway:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "${cors.allowed-origins}"
+            allowedOrigins: "*"
             allowedMethods:
               - GET
               - POST
