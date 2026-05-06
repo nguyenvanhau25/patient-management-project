@@ -23,7 +23,7 @@ public class BillingApplicationService implements BillingService {
     private final BillingDomainService domainService;
 
     @Override
-    public void saveBillingEvent(BillingEvent event) {
+    public void processBillingEvent(BillingEvent event) {
 
         BillingAnalytics analytics = new BillingAnalytics();
         analytics.setTransactionId(event.getTransactionId());

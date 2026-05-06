@@ -54,7 +54,7 @@ public class KafkaConsumer {
             );
 
             //  Đẩy qua service để lưu DB
-            billingService.saveBillingEvent(event);
+            billingService.processBillingEvent(event);
 
         } catch (InvalidProtocolBufferException e) {
             log.error("Failed to parse BillingEvent from Kafka", e);

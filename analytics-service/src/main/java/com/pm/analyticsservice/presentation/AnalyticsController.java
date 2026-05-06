@@ -41,10 +41,6 @@ public class AnalyticsController {
 
         long n = analyticsService.countPatientsByDate(localDate);
 
-        if (n == 0) {
-            throw new AppException(ErrorCode.PATIENT_NOT_FOUND, "Không có bệnh nhân đăng ký trong ngày này");
-        }
-
         return ResponseEntity.ok(ApiResponse.<Long>builder()
                 .code("SUCCESS")
                 .message("Thành công")
@@ -64,10 +60,6 @@ public class AnalyticsController {
         }
 
         List<PatientAnalytics> patients = analyticsService.getPatientsByDate(localDate);
-
-        if (patients.isEmpty()) {
-            throw new AppException(ErrorCode.PATIENT_NOT_FOUND, "Không có bệnh nhân đăng ký trong ngày này");
-        }
 
         List<PatientAnalyticsResponse> response = patients.stream()
                 .map(AnalyticsMapper::toResponse)

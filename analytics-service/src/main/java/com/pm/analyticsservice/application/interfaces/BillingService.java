@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface BillingService {
 
-    void saveBillingEvent(BillingEvent event);
+    void processBillingEvent(BillingEvent event);
 
     //  DOANH THU THEO NGÀY (VẼ LINE CHART)
     Double getTotalRevenue(LocalDate date);

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Repository
 @RequiredArgsConstructor
 public class BillingAccountJpaAdapter implements BillingAccountDomainRepository {
@@ -31,11 +30,8 @@ public class BillingAccountJpaAdapter implements BillingAccountDomainRepository 
     }
 
     @Override
-    public BillingAccount  delete(BillingAccount account) {
-         jpaRepo.delete(account);
-         if(jpaRepo.findById(account.getId()).isPresent()){
-             return account;
-         }
-         return null;
+    public BillingAccount delete(BillingAccount account) {
+        jpaRepo.delete(account);
+        return account;
     }
 }
